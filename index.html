@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>請求管理ツール | パル設計</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- html2pdf.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+<!-- ヘッダー -->
+<header class="app-header">
+  <div class="header-content">
+    <h1 class="app-title">請求管理ツール</h1>
+    <div class="header-actions">
+      <div id="data-status" class="data-status syncing">
+        <span class="status-dot"></span>
+        <span class="status-text">接続中...</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- タブナビゲーション -->
+<nav class="tab-nav">
+  <button class="tab-btn active" data-tab="input">📝 請求入力</button>
+  <button class="tab-btn" data-tab="list">📊 請求一覧</button>
+  <button class="tab-btn" data-tab="notice">📄 支払通知発行</button>
+  <button class="tab-btn" data-tab="settings">⚙️ 設定</button>
+</nav>
+
+<!-- メインコンテンツ -->
+<main class="main-content">
+
+  <!-- === 請求入力セクション === -->
+  <section id="tab-input" class="tab-content active">
+    <div class="card">
+      <h2 class="section-title">請求入力</h2>
+      <form id="invoice-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="input-company">会社名 <span style="color:#DC2626">*</span></label>
+            <div class="autocomplete-wrapper">
+              <input type="text" id="input-company" class="form-input" placeholder="会社名を入力" autocomplete="off" required>
+              <div id="company-suggestions" class="autocomplete-list hidden"></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="input-site">現場名 <span style="color:#DC2626">*</span></label>
+            <div class="autocomplete-wrapper">
+              <input type="text" id="input-site" class="form-input" placeholder="現場名を入力" autocomplete="off" required>
+              <div id="site-suggestions" class="autocomplete-list hidden"></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="input-date">請求書年月日 <span style="color:#DC2626">*</span></label>
+            <input type="date" id="input-date" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="input-work-type">工事内容 <span style="color:#DC2626">*</span></label>
+            <div class="autocomplete-wrapper">
+              <input type="text" id="input-work-type" class="form-input" placeholder="工事内容を入力" autocomplete="off" required>
+              <div id="work-suggestions" class="autocomplete-list hidden"></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="input-amount">金額（税込） <span style="color:#DC2626">*</span></label>
+            <input type="text" id="input-amount" class="form-input" placeholder="例: 1,000,000" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="input-payment-month">支払月 <span style="color:#DC2626">*</span></label>
+            <input type="month" id="input-payment-month" class="form-input" required>
+          </div>
+        </div>
+        <div class="btn-group mt-4">
+          <button type="button" id="btn-clear-form" class="btn btn-secondary">クリア</button>
+          <button type="submit" id="btn-submit-invoice" class="btn btn-primary">登録</button>
+        </div>
+      </form>
+    </div>
+    <!-- 直近の登録一覧 -->
+    <div class="card">
+      <h2 class="section-title">直近の登録</h2>
+      <div id="recent-invoices"></div>
+    </div>
+  </section>
+
+  <!-- === 請求一覧セクション === -->
+  <section id="tab-list" class="tab-content">
+    <div class="card">
+      <div class="flex-between">
+        <h2 class="section-title" style="margin-bottom:0">請求一覧</h2>
+        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+          <div class="month-selector" style="margin-bottom:0">
+            <button id="btn-list-prev" class="month-nav-btn">◀</button>
+            <span id="list-month-display" class="month-display"></span>
+            <button id="btn-list-next" class="month-nav-btn">▶</button>
+          </div>
+          <div class="btn-group" style="margin-top: 0;">
+            <button id="btn-export-list-pdf" class="btn btn-secondary btn-sm">📄 PDF出力 (A3横)</button>
+            <button id="btn-export-list-csv" class="btn btn-secondary btn-sm">📥 CSV出力</button>
+          </div>
+        </div>
+      </div>
+      <p id="list-title" class="section-subtitle"></p>
+    </div>
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <div class="cross-table-container">
+        <table id="cross-table" class="cross-table">
+          <thead id="cross-table-head"></thead>
+          <tbody id="cross-table-body"></tbody>
+        </table>
+      </div>
+      <div id="list-empty" class="hidden" style="padding: 40px; text-align: center; color: #64748B;">この月の請求データはありません</div>
+    </div>
+  </section>
+
+  <!-- === 支払通知発行セクション === -->
+  <section id="tab-notice" class="tab-content">
+    <div class="card">
+      <h2 class="section-title">支払通知発行</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="notice-company">会社名</label>
+          <select id="notice-company" class="form-select">
+            <option value="">会社を選択してください</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="notice-month">支払月</label>
+          <input type="month" id="notice-month" class="form-input">
+        </div>
+      </div>
+      <div class="btn-group mt-4">
+        <button id="btn-preview-notice" class="btn btn-secondary">プレビュー</button>
+        <button id="btn-generate-pdf" class="btn btn-primary">PDF出力</button>
+      </div>
+    </div>
+    <div id="notice-preview-container" class="hidden">
+      <div id="notice-preview" class="notice-preview">
+        <!-- PDF content will be generated here -->
+      </div>
+    </div>
+  </section>
+
+  <!-- === 設定セクション === -->
+  <section id="tab-settings" class="tab-content">
+    <div class="card">
+      <h2 class="section-title">自社情報</h2>
+      <form id="settings-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="settings-company-name">会社名</label>
+            <input type="text" id="settings-company-name" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="settings-postal-code">郵便番号</label>
+            <input type="text" id="settings-postal-code" class="form-input" placeholder="〒000-0000">
+          </div>
+          <div class="form-group full-width">
+            <label class="form-label" for="settings-address">住所</label>
+            <input type="text" id="settings-address" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="settings-tel">電話番号</label>
+            <input type="text" id="settings-tel" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="settings-fax">FAX番号</label>
+            <input type="text" id="settings-fax" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="settings-invoice-number">インボイス登録番号</label>
+            <input type="text" id="settings-invoice-number" class="form-input" placeholder="T0000000000000">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="settings-tax-rate">消費税率（%）</label>
+            <input type="number" id="settings-tax-rate" class="form-input" value="10" min="0" max="100">
+          </div>
+        </div>
+        <div class="btn-group mt-4">
+          <button type="submit" class="btn btn-primary">保存</button>
+        </div>
+      </form>
+    </div>
+    <div class="card">
+      <div class="flex-between">
+        <h2 class="section-title" style="margin-bottom:0">会社マスター</h2>
+        <button id="btn-add-company" class="btn btn-primary btn-sm">+ 新規追加</button>
+      </div>
+      <div id="company-master-list" class="mt-4"></div>
+    </div>
+    <div class="card">
+      <h2 class="section-title">データ管理</h2>
+      <div class="btn-group" style="justify-content: flex-start;">
+        <button id="btn-export-json" class="btn btn-secondary">📥 エクスポート (JSON)</button>
+        <button id="btn-import-json" class="btn btn-secondary">📤 インポート (JSON)</button>
+        <input type="file" id="import-file-input" accept=".json" class="hidden">
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- 会社登録/編集モーダル -->
+<div id="company-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <button class="modal-close" id="btn-close-company-modal">✕</button>
+    <h3 class="modal-title" id="company-modal-title">会社情報登録</h3>
+    <form id="company-form">
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label class="form-label" for="company-name">会社名 <span style="color:#DC2626">*</span></label>
+          <input type="text" id="company-name" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="company-industry">業種</label>
+          <select id="company-industry" class="form-select">
+            <option value="">選択してください</option>
+            <option value="外注">外注</option>
+            <option value="資材">資材</option>
+            <option value="機器">機器</option>
+            <option value="経費">経費</option>
+            <option value="その他">その他</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="company-postal">郵便番号</label>
+          <input type="text" id="company-postal" class="form-input" placeholder="〒000-0000">
+        </div>
+        <div class="form-group full-width">
+          <label class="form-label" for="company-address">住所</label>
+          <input type="text" id="company-address" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="company-tel">電話番号</label>
+          <input type="text" id="company-tel" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="company-fax">FAX番号</label>
+          <input type="text" id="company-fax" class="form-input">
+        </div>
+        <div class="form-group full-width">
+          <label class="form-label" for="company-invoice-num">インボイス登録番号</label>
+          <input type="text" id="company-invoice-num" class="form-input" placeholder="T0000000000000">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="company-bank">銀行名</label>
+          <input type="text" id="company-bank" class="form-input" placeholder="例: みずほ銀行">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="company-branch">支店名</label>
+          <input type="text" id="company-branch" class="form-input" placeholder="例: 渋谷支店">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="company-account-type">口座種別</label>
+          <select id="company-account-type" class="form-select">
+            <option value="普通">普通</option>
+            <option value="当座">当座</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="company-account-num">口座番号</label>
+          <input type="text" id="company-account-num" class="form-input">
+        </div>
+      </div>
+      <div class="btn-group mt-4">
+        <button type="button" id="btn-cancel-company" class="btn btn-secondary">キャンセル</button>
+        <button type="submit" class="btn btn-primary">登録</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 請求詳細/編集モーダル -->
+<div id="invoice-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <button class="modal-close" id="btn-close-invoice-modal">✕</button>
+    <h3 class="modal-title">請求詳細</h3>
+    <div id="invoice-modal-content"></div>
+  </div>
+</div>
+
+<!-- トースト通知 -->
+<div id="toast-container" style="position:fixed;top:20px;right:20px;z-index:2000;"></div>
+
+<script src="app.js" defer></script>
+</body>
+</html>
