@@ -12,7 +12,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "アイスコンフォート"
     },
     {
       "id": "c002",
@@ -26,7 +27,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "赤門ウイレックス"
     },
     {
       "id": "c003",
@@ -40,7 +42,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "アキラテック"
     },
     {
       "id": "c004",
@@ -54,7 +57,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "浅沼設備"
     },
     {
       "id": "c005",
@@ -68,7 +72,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "朝日機材"
     },
     {
       "id": "c006",
@@ -82,7 +87,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "浅海電気"
     },
     {
       "id": "c007",
@@ -96,7 +102,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "アトミック"
     },
     {
       "id": "c008",
@@ -110,7 +117,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "ATLAS"
     },
     {
       "id": "c009",
@@ -124,7 +132,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "アネック"
     },
     {
       "id": "c010",
@@ -138,7 +147,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "ALSOK常駐警備"
     },
     {
       "id": "c011",
@@ -152,7 +162,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "イシグロ"
     },
     {
       "id": "c012",
@@ -166,7 +177,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "イリンクス"
     },
     {
       "id": "c013",
@@ -180,7 +192,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "伊藤ダクト"
     },
     {
       "id": "c014",
@@ -194,7 +207,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "上村建設工業"
     },
     {
       "id": "c015",
@@ -208,7 +222,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "S.K.U"
     },
     {
       "id": "c016",
@@ -222,7 +237,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "NYKシステムズ"
     },
     {
       "id": "c017",
@@ -236,7 +252,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "オーテック"
     },
     {
       "id": "c018",
@@ -250,7 +267,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "大空"
     },
     {
       "id": "c019",
@@ -264,7 +282,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "岡里工業"
     },
     {
       "id": "c020",
@@ -278,7 +297,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "オキナ"
     },
     {
       "id": "c021",
@@ -292,7 +312,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "奥島工業"
     },
     {
       "id": "c022",
@@ -306,7 +327,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "オムステンレス工業"
     },
     {
       "id": "c023",
@@ -320,7 +342,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "桂田設備"
     },
     {
       "id": "c024",
@@ -334,7 +357,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "カナデン"
     },
     {
       "id": "c025",
@@ -348,7 +372,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "管清工業"
     },
     {
       "id": "c026",
@@ -362,7 +387,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "キュービック"
     },
     {
       "id": "c027",
@@ -376,7 +402,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "協立工業"
     },
     {
       "id": "c028",
@@ -390,7 +417,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "クリタ･ビーエムエス"
     },
     {
       "id": "c029",
@@ -404,7 +432,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "ケイ･ディ･レタン工業"
     },
     {
       "id": "c030",
@@ -418,7 +447,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "光伸"
     },
     {
       "id": "c031",
@@ -432,7 +462,8 @@
       "bankName": "巣鴨信用金庫",
       "branchName": "志村支店",
       "accountType": "普通",
-      "accountNumber": "3188384"
+      "accountNumber": "3188384",
+      "kana": "興隆"
     },
     {
       "id": "c032",
@@ -446,7 +477,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "寿産業"
     },
     {
       "id": "c033",
@@ -460,7 +492,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "弘電社"
     },
     {
       "id": "c034",
@@ -474,7 +507,8 @@
       "bankName": "みずほ銀行",
       "branchName": "八重洲口支店",
       "accountType": "当座",
-      "accountNumber": "0004786"
+      "accountNumber": "0004786",
+      "kana": "古島"
     },
     {
       "id": "c035",
@@ -488,7 +522,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "斉藤機工"
     },
     {
       "id": "c036",
@@ -502,7 +537,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "サンエイ"
     },
     {
       "id": "c037",
@@ -516,7 +552,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "三功工業所"
     },
     {
       "id": "c038",
@@ -530,7 +567,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "勝研テクノストラクチャー"
     },
     {
       "id": "c039",
@@ -544,7 +582,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "昭和機工"
     },
     {
       "id": "c040",
@@ -558,7 +597,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "白浜空設"
     },
     {
       "id": "c041",
@@ -572,7 +612,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "新宮昇"
     },
     {
       "id": "c042",
@@ -586,7 +627,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "新成工業"
     },
     {
       "id": "c043",
@@ -600,7 +642,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "進和テック"
     },
     {
       "id": "c044",
@@ -614,7 +657,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "ジェイ・エヌ・メディアネットワーク"
     },
     {
       "id": "c045",
@@ -628,7 +672,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "ジャパンギャランティサービス"
     },
     {
       "id": "c046",
@@ -642,7 +687,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "須崎直"
     },
     {
       "id": "c047",
@@ -656,7 +702,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "セーフィー"
     },
     {
       "id": "c048",
@@ -670,7 +717,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "誠恒"
     },
     {
       "id": "c049",
@@ -684,7 +732,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "綜合警備保障　ALSOK"
     },
     {
       "id": "c050",
@@ -698,7 +747,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "ソエダ"
     },
     {
       "id": "c051",
@@ -712,7 +762,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "太洋商事"
     },
     {
       "id": "c052",
@@ -726,7 +777,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "太陽保温工業"
     },
     {
       "id": "c053",
@@ -740,7 +792,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "多摩川機工"
     },
     {
       "id": "c054",
@@ -754,7 +807,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "タイロン"
     },
     {
       "id": "c055",
@@ -768,7 +822,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "大勇フリーズ"
     },
     {
       "id": "c056",
@@ -782,7 +837,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "大輝設備"
     },
     {
       "id": "c057",
@@ -796,7 +852,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "貴空空調"
     },
     {
       "id": "c058",
@@ -810,7 +867,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "拓瑛工業"
     },
     {
       "id": "c059",
@@ -824,7 +882,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "高橋管工社"
     },
     {
       "id": "c060",
@@ -838,7 +897,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "中日トラスト"
     },
     {
       "id": "c061",
@@ -852,7 +912,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "TKワーク"
     },
     {
       "id": "c062",
@@ -866,7 +927,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "トーシン"
     },
     {
       "id": "c063",
@@ -880,7 +942,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "東伸工業"
     },
     {
       "id": "c064",
@@ -894,7 +957,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "東テク"
     },
     {
       "id": "c065",
@@ -908,7 +972,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "東邦電気工事"
     },
     {
       "id": "c066",
@@ -922,7 +987,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "Trustech"
     },
     {
       "id": "c067",
@@ -936,7 +1002,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "ナイガイ"
     },
     {
       "id": "c068",
@@ -950,7 +1017,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "中川製作所"
     },
     {
       "id": "c069",
@@ -964,7 +1032,8 @@
       "bankName": "りそな銀行",
       "branchName": "品川支店",
       "accountType": "普通",
-      "accountNumber": "0010711"
+      "accountNumber": "0010711",
+      "kana": "ナカジマ"
     },
     {
       "id": "c070",
@@ -978,7 +1047,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "日設管興"
     },
     {
       "id": "c071",
@@ -992,7 +1062,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "日本管材センター"
     },
     {
       "id": "c072",
@@ -1006,7 +1077,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "日本経済サポート"
     },
     {
       "id": "c073",
@@ -1020,7 +1092,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "日本消音研究所"
     },
     {
       "id": "c074",
@@ -1034,7 +1107,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "能美防災"
     },
     {
       "id": "c075",
@@ -1048,7 +1122,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "原口動力"
     },
     {
       "id": "c076",
@@ -1062,7 +1137,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "はんこ屋さん21"
     },
     {
       "id": "c077",
@@ -1076,7 +1152,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "ハイブリッヂテクノサービス"
     },
     {
       "id": "c078",
@@ -1090,7 +1167,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "ヒューマンテクノロジーズ"
     },
     {
       "id": "c079",
@@ -1104,7 +1182,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "藤田設備"
     },
     {
       "id": "c080",
@@ -1118,7 +1197,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "福田設備"
     },
     {
       "id": "c081",
@@ -1132,7 +1212,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "富士フィルムビジネスイノベーション"
     },
     {
       "id": "c082",
@@ -1146,7 +1227,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "勝"
     },
     {
       "id": "c083",
@@ -1160,7 +1242,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "松本工業"
     },
     {
       "id": "c084",
@@ -1174,7 +1257,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "丸井産業株式会社"
     },
     {
       "id": "c085",
@@ -1188,7 +1272,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "水谷"
     },
     {
       "id": "c086",
@@ -1202,7 +1287,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "瑞穂"
     },
     {
       "id": "c087",
@@ -1216,7 +1302,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "三戸部覚"
     },
     {
       "id": "c088",
@@ -1230,7 +1317,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "ミドリ安全"
     },
     {
       "id": "c089",
@@ -1244,7 +1332,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "ミヤデラ断熱"
     },
     {
       "id": "c090",
@@ -1258,7 +1347,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "翠屋施工"
     },
     {
       "id": "c091",
@@ -1272,7 +1362,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "三菱電機ビルテクノサービス"
     },
     {
       "id": "c092",
@@ -1286,7 +1377,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "三菱電機ビルソリューションズ"
     },
     {
       "id": "c093",
@@ -1300,7 +1392,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "明星建工"
     },
     {
       "id": "c094",
@@ -1314,7 +1407,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "メルコヤマイチ"
     },
     {
       "id": "c095",
@@ -1328,7 +1422,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "モリ工業"
     },
     {
       "id": "c096",
@@ -1342,7 +1437,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "夢真"
     },
     {
       "id": "c097",
@@ -1356,7 +1452,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "吉田俊彦(新栄)"
     },
     {
       "id": "c098",
@@ -1370,7 +1467,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "琉南設備工業"
     },
     {
       "id": "c099",
@@ -1384,7 +1482,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "レント"
     },
     {
       "id": "c100",
@@ -1398,7 +1497,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "八重工業"
     },
     {
       "id": "c101",
@@ -1412,7 +1512,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "ヤマトプロテック"
     },
     {
       "id": "c102",
@@ -1426,7 +1527,8 @@
       "bankName": "三菱UFJ銀行",
       "branchName": "田町支店",
       "accountType": "普通",
-      "accountNumber": "0037579"
+      "accountNumber": "0037579",
+      "kana": "ユナイテッドエンジニアリング"
     },
     {
       "id": "c103",
@@ -1440,7 +1542,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "若松空調"
     },
     {
       "id": "c104",
@@ -1454,7 +1557,8 @@
       "bankName": "",
       "branchName": "",
       "accountType": "普通",
-      "accountNumber": ""
+      "accountNumber": "",
+      "kana": "ワールドコーポレーション"
     }
   ],
   "sites": [

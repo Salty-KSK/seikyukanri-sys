@@ -70,7 +70,68 @@
 
   // 日本語あいうえお順ソート
   function sortByJapanese(a, b) {
-    return a.localeCompare(b, 'ja');
+    return (a || '').localeCompare(b || '', 'ja');
+  }
+
+  // 半角カタカナを全角カタカナに変換し、機種依存の括弧付き文字等を除去する
+  function hankakuToZenkaku(str) {
+    if (!str) return '';
+    
+    const map = {
+      'ｱ': 'ア', 'ｲ': 'イ', 'ｳ': 'ウ', 'ｴ': 'エ', 'ｵ': 'オ',
+      'ｶ': 'カ', 'ｷ': 'キ', 'ｸ': 'ク', 'ｹ': 'ケ', 'ｺ': 'コ',
+      'ｻ': 'サ', 'ｼ': 'シ', 'ｽ': 'ス', 'ｾ': 'セ', 'ｿ': 'ソ',
+      'ﾀ': 'タ', 'ﾁ': 'チ', 'ﾂ': 'ツ', 'ﾃ': 'テ', 'ﾄ': 'ト',
+      'ﾅ': 'ナ', 'ﾆ': 'ニ', 'ﾇ': 'ヌ', 'ﾈ': 'ネ', 'ﾉ': 'ノ',
+      'ﾊ': 'ハ', 'ﾋ': 'ヒ', 'ﾌ': 'フ', 'ﾍ': 'ヘ', 'ﾎ': 'ホ',
+      'ﾏ': 'マ', 'ﾐ': 'ミ', 'ﾑ': 'ム', 'ﾒ': 'メ', 'ﾓ': 'モ',
+      'ﾔ': 'ヤ', 'ﾕ': 'ユ', 'ﾖ': 'ヨ',
+      'ﾗ': 'ラ', 'ﾘ': 'リ', 'ﾙ': 'ル', 'ﾚ': 'レ', 'ﾛ': 'ロ',
+      'ﾜ': 'ワ', 'ｦ': 'ヲ', 'ﾝ': 'ン',
+      'ｧ': 'ァ', 'ｨ': 'ィ', 'ｩ': 'ゥ', 'ｪ': 'ェ', 'ｫ': 'ォ',
+      'ｬ': 'ャ', 'ｭ': 'ュ', 'ｮ': 'ョ', 'ｯ': 'ッ',
+      'ｰ': 'ー', '  ': '　', ' ': ' ',
+      'ﾞ': '゛', 'ﾟ': '゜'
+    };
+    
+    const dakutenMap = {
+      'ｶﾞ': 'ガ', 'ｷﾞ': 'ギ', 'ｸﾞ': 'グ', 'ｹﾞ': 'ゲ', 'ｺﾞ': 'ゴ',
+      'ｻﾞ': 'ザ', 'ｼﾞ': 'ジ', 'ｽﾞ': 'ズ', 'ｾﾞ': 'ゼ', 'ｿﾞ': 'ゾ',
+      'ﾀﾞ': 'ダ', 'ﾁﾞ': 'ヂ', 'ﾂﾞ': 'ヅ', 'ﾃﾞ': 'デ', 'ﾄﾞ': 'ド',
+      'ﾊﾞ': 'バ', 'ﾋﾞ': 'ビ', 'ﾌﾞ': 'ブ', 'ﾍﾞ': 'ベ', 'ﾎﾞ': 'ボ',
+      'ﾊﾟ': 'パ', 'ﾋﾟ': 'ピ', 'ﾌﾟ': 'プ', 'ﾍﾟ': 'ペ', 'ﾎﾟ': 'ポ',
+      'ｳﾞ': 'ヴ'
+    };
+    
+    let result = str;
+    // 機種依存の括弧付き文字の除去
+    result = result.replace(/[㈲㈱㈴㈵㈶㈷㈸㈹㈺㈻㈼㈽㈾㈿㉀㈜]/g, '');
+    result = result.replace(/[(（](株|有|名|資|合|合資|合名|有資)[)）]/g, '');
+    
+    // まず濁点・半濁点の2文字の組み合わせを置換
+    for (const [key, val] of Object.entries(dakutenMap)) {
+      result = result.replace(new RegExp(key, 'g'), val);
+    }
+    // その後、個別の半角カナを置換
+    let finalStr = '';
+    for (let i = 0; i < result.length; i++) {
+      const char = result[i];
+      finalStr += map[char] || char;
+    }
+    
+    // ひらがなもカタカナに変換して統一する
+    finalStr = finalStr.replace(/[\u3041-\u3096]/g, function(match) {
+      return String.fromCharCode(match.charCodeAt(0) + 0x60);
+    });
+
+    return finalStr.trim();
+  }
+
+  // 会社のソート（kana優先、なければnameをクレンジングしてフォールバック）
+  function sortByCompanyKana(a, b) {
+    const kanaA = a.kana || hankakuToZenkaku(a.name) || '';
+    const kanaB = b.kana || hankakuToZenkaku(b.name) || '';
+    return sortByJapanese(kanaA, kanaB);
   }
 
   // ----------------------------------------------------------
@@ -348,7 +409,7 @@
 
     // オートコンプリート設定
     setupAutocomplete('input-company', 'company-suggestions', () =>
-      appData.companies.map((c) => c.name).sort(sortByJapanese)
+      [...appData.companies].sort(sortByCompanyKana).map((c) => c.name)
     );
     setupAutocomplete('input-site', 'site-suggestions', () =>
       [...new Set(appData.sites)].sort(sortByJapanese)
@@ -394,6 +455,7 @@
       company = {
         id: generateId(),
         name: companyName,
+        kana: hankakuToZenkaku(companyName),
         industry: '',
         postalCode: '',
         address: '',
@@ -496,12 +558,21 @@
   function initCompanyModal() {
     const modal = document.getElementById('company-modal');
     const form = document.getElementById('company-form');
+    const nameInput = document.getElementById('company-name');
+    const kanaInput = document.getElementById('company-kana');
 
     document.getElementById('btn-close-company-modal').addEventListener('click', closeCompanyModal);
     document.getElementById('btn-cancel-company').addEventListener('click', closeCompanyModal);
 
     modal.addEventListener('click', (e) => {
       if (e.target === modal) closeCompanyModal();
+    });
+
+    // 会社名が変更されたら、新規登録時に限りフリガナを自動提案する
+    nameInput.addEventListener('input', () => {
+      if (!editingCompanyId) {
+        kanaInput.value = hankakuToZenkaku(nameInput.value);
+      }
     });
 
     form.addEventListener('submit', (e) => {
@@ -520,6 +591,7 @@
       const c = appData.companies.find((co) => co.id === companyId);
       if (c) {
         document.getElementById('company-name').value = c.name;
+        document.getElementById('company-kana').value = c.kana || hankakuToZenkaku(c.name);
         document.getElementById('company-industry').value = c.industry || '';
         document.getElementById('company-postal').value = c.postalCode || '';
         document.getElementById('company-address').value = c.address || '';
@@ -535,6 +607,7 @@
       titleEl.textContent = '会社情報登録';
       document.getElementById('company-form').reset();
       document.getElementById('company-name').value = name || '';
+      document.getElementById('company-kana').value = hankakuToZenkaku(name || '');
     }
 
     modal.classList.remove('hidden');
@@ -547,13 +620,19 @@
 
   function saveCompany() {
     const name = document.getElementById('company-name').value.trim();
+    const kana = document.getElementById('company-kana').value.trim();
     if (!name) {
       showToast('会社名を入力してください', 'error');
+      return;
+    }
+    if (!kana) {
+      showToast('フリガナを入力してください', 'error');
       return;
     }
 
     const companyData = {
       name,
+      kana: hankakuToZenkaku(kana),
       industry: document.getElementById('company-industry').value,
       postalCode: document.getElementById('company-postal').value.trim(),
       address: document.getElementById('company-address').value.trim(),
@@ -652,8 +731,13 @@
     const companyIds = Object.keys(companyMap);
     const companyInfos = companyIds.map((id) => {
       const c = appData.companies.find((co) => co.id === id);
-      return { id, name: c ? c.name : '不明', industry: c ? c.industry || '' : '' };
-    }).sort((a, b) => sortByJapanese(a.name, b.name));
+      return { 
+        id, 
+        name: c ? c.name : '不明', 
+        kana: c ? c.kana || hankakuToZenkaku(c.name) : 'フメイ',
+        industry: c ? c.industry || '' : '' 
+      };
+    }).sort((a, b) => sortByJapanese(a.kana, b.kana));
 
     // ヘッダー行
     const thead = document.getElementById('cross-table-head');
@@ -741,8 +825,13 @@
     const companyIds = Object.keys(companyMap);
     const companyInfos = companyIds.map((id) => {
       const c = appData.companies.find((co) => co.id === id);
-      return { id, name: c ? c.name : '不明', industry: c ? c.industry || '' : '' };
-    }).sort((a, b) => sortByJapanese(a.name, b.name));
+      return { 
+        id, 
+        name: c ? c.name : '不明', 
+        kana: c ? c.kana || hankakuToZenkaku(c.name) : 'フメイ',
+        industry: c ? c.industry || '' : '' 
+      };
+    }).sort((a, b) => sortByJapanese(a.kana, b.kana));
 
     // CSVの作成
     let csvContent = '';
@@ -822,8 +911,13 @@
     const companyIds = Object.keys(companyMap);
     const companyInfos = companyIds.map((id) => {
       const c = appData.companies.find((co) => co.id === id);
-      return { id, name: c ? c.name : '不明', industry: c ? c.industry || '' : '' };
-    }).sort((a, b) => sortByJapanese(a.name, b.name));
+      return { 
+        id, 
+        name: c ? c.name : '不明', 
+        kana: c ? c.kana || hankakuToZenkaku(c.name) : 'フメイ',
+        industry: c ? c.industry || '' : '' 
+      };
+    }).sort((a, b) => sortByJapanese(a.kana, b.kana));
 
     // ── スタイル定数 ──
     const colW = 110;
@@ -970,7 +1064,7 @@
 
   function refreshNoticeSection() {
     const select = document.getElementById('notice-company');
-    const companies = [...appData.companies].sort((a, b) => sortByJapanese(a.name, b.name));
+    const companies = [...appData.companies].sort(sortByCompanyKana);
 
     select.innerHTML = '<option value="">会社を選択してください</option>';
     companies.forEach((c) => {
@@ -1215,7 +1309,7 @@
 
   function refreshCompanyMasterList() {
     const container = document.getElementById('company-master-list');
-    const companies = [...appData.companies].sort((a, b) => sortByJapanese(a.name, b.name));
+    const companies = [...appData.companies].sort(sortByCompanyKana);
 
     if (companies.length === 0) {
       container.innerHTML = '<p style="color:#64748B;text-align:center;padding:20px;">登録された会社はありません</p>';
@@ -1224,12 +1318,13 @@
 
     let html = `<table class="data-table">
       <thead><tr>
-        <th>会社名</th><th>業種</th><th>電話番号</th><th>銀行</th><th>操作</th>
+        <th>会社名</th><th>フリガナ</th><th>業種</th><th>電話番号</th><th>銀行</th><th>操作</th>
       </tr></thead><tbody>`;
 
     companies.forEach((c) => {
       html += `<tr>
         <td>${escapeHtml(c.name)}</td>
+        <td>${escapeHtml(c.kana || '—')}</td>
         <td>${escapeHtml(c.industry || '—')}</td>
         <td>${escapeHtml(c.tel || '—')}</td>
         <td>${escapeHtml(c.bankName ? `${c.bankName}/${c.branchName || ''}` : '—')}</td>
