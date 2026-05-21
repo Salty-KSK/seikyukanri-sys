@@ -102,7 +102,7 @@
   // ----------------------------------------------------------
   // データ管理 (Google Apps Script + localStorage キャッシュ)
   // ----------------------------------------------------------
-  const GAS_URL = 'https://script.google.com/macros/s/AKfycbzdyY4EVgcpyB1c-_fMOAusNxGlvyJUKdudJGpKNGvFTGoLcyvnfh2ZMGbSWBpHF_ylAA/exec';
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbw6G6lXEqemHGSR6J5KrOS6zPX3SSKoo3__ZoxUQN32nquh_RWCEvOGZSa1I7RiBz0j2w/exec';
   const LS_KEY = 'invoiceTool_data';
   let syncTimeout = null;
 
