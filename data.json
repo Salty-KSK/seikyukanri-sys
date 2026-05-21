@@ -745,7 +745,7 @@
     {
       "id": "c054",
       "name": "タイロン㈱",
-      "industry": "",
+      "industry": "資材",
       "postalCode": "",
       "address": "",
       "tel": "",
@@ -787,7 +787,7 @@
     {
       "id": "c057",
       "name": "㈱貴空空調",
-      "industry": "",
+      "industry": "外注",
       "postalCode": "",
       "address": "",
       "tel": "",
@@ -815,7 +815,7 @@
     {
       "id": "c059",
       "name": "㈱高橋管工社",
-      "industry": "",
+      "industry": "外注",
       "postalCode": "",
       "address": "",
       "tel": "",
@@ -899,7 +899,7 @@
     {
       "id": "c065",
       "name": "東邦電気工事㈱",
-      "industry": "",
+      "industry": "外注",
       "postalCode": "",
       "address": "",
       "tel": "",
@@ -1025,7 +1025,7 @@
     {
       "id": "c074",
       "name": "能美防災㈱",
-      "industry": "",
+      "industry": "外注",
       "postalCode": "",
       "address": "",
       "tel": "",
@@ -1403,7 +1403,7 @@
     {
       "id": "c101",
       "name": "ﾔﾏﾄﾌﾟﾛﾃｯｸ㈱",
-      "industry": "",
+      "industry": "外注",
       "postalCode": "",
       "address": "",
       "tel": "",
@@ -2004,6 +2004,266 @@
       "amount": 137500,
       "paymentMonth": "2026-05",
       "createdAt": "2026-05-21T09:46:44.523Z"
+    },
+    {
+      "id": "inv050",
+      "companyId": "c008",
+      "siteName": "日新上野",
+      "invoiceDate": "2026-04-20",
+      "workType": "施工管理",
+      "amount": 330000,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.277Z"
+    },
+    {
+      "id": "inv051",
+      "companyId": "c008",
+      "siteName": "理想表参道(one表参道)",
+      "invoiceDate": "2026-04-20",
+      "workType": "施工管理",
+      "amount": 220000,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.278Z"
+    },
+    {
+      "id": "inv052",
+      "companyId": "c008",
+      "siteName": "渋谷駅橋上駅舎",
+      "invoiceDate": "2026-04-20",
+      "workType": "施工管理",
+      "amount": 89100,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.278Z"
+    },
+    {
+      "id": "inv053",
+      "companyId": "c008",
+      "siteName": "その他諸工事",
+      "invoiceDate": "2026-04-20",
+      "workType": "施工管理",
+      "amount": 1465200,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.278Z"
+    },
+    {
+      "id": "inv054",
+      "companyId": "c016",
+      "siteName": "その他諸工事",
+      "invoiceDate": "2026-04-20",
+      "workType": "ｷｬﾄﾞｿﾌﾄ",
+      "amount": 33000,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.278Z"
+    },
+    {
+      "id": "inv055",
+      "companyId": "c037",
+      "siteName": "渋谷駅橋上駅舎",
+      "invoiceDate": "2026-04-20",
+      "workType": "ﾀﾞﾝﾊﾟｰ",
+      "amount": 48730,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.278Z"
+    },
+    {
+      "id": "inv056",
+      "companyId": "c037",
+      "siteName": "その他諸工事",
+      "invoiceDate": "2026-04-20",
+      "workType": "ﾀﾞﾝﾊﾟｰ",
+      "amount": 143000,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.278Z"
+    },
+    {
+      "id": "inv057",
+      "companyId": "c040",
+      "siteName": "目黒ｾﾝﾀｰﾋﾞﾙ",
+      "invoiceDate": "2026-04-20",
+      "workType": "ﾀﾞｸﾄ",
+      "amount": 165000,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.278Z"
+    },
+    {
+      "id": "inv058",
+      "companyId": "c040",
+      "siteName": "日新上野",
+      "invoiceDate": "2026-04-20",
+      "workType": "ﾀﾞｸﾄ",
+      "amount": 385000,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.278Z"
+    },
+    {
+      "id": "inv059",
+      "companyId": "c040",
+      "siteName": "理想表参道(one表参道)",
+      "invoiceDate": "2026-04-20",
+      "workType": "ﾀﾞｸﾄ",
+      "amount": 165000,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.278Z"
+    },
+    {
+      "id": "inv060",
+      "companyId": "c040",
+      "siteName": "小田急町田",
+      "invoiceDate": "2026-04-20",
+      "workType": "ﾀﾞｸﾄ",
+      "amount": 330000,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.278Z"
+    },
+    {
+      "id": "inv061",
+      "companyId": "c044",
+      "siteName": "渋谷駅橋上駅舎",
+      "invoiceDate": "2026-04-20",
+      "workType": "風量測定",
+      "amount": 880000,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.278Z"
+    },
+    {
+      "id": "inv062",
+      "companyId": "c052",
+      "siteName": "日新上野",
+      "invoiceDate": "2026-04-20",
+      "workType": "保温",
+      "amount": 660000,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.278Z"
+    },
+    {
+      "id": "inv063",
+      "companyId": "c052",
+      "siteName": "理想表参道(one表参道)",
+      "invoiceDate": "2026-04-20",
+      "workType": "保温",
+      "amount": 495000,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.278Z"
+    },
+    {
+      "id": "inv064",
+      "companyId": "c052",
+      "siteName": "新橋駅改良工事",
+      "invoiceDate": "2026-04-20",
+      "workType": "保温",
+      "amount": 132000,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.278Z"
+    },
+    {
+      "id": "inv065",
+      "companyId": "c052",
+      "siteName": "小田急町田",
+      "invoiceDate": "2026-04-20",
+      "workType": "保温",
+      "amount": 2530000,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.278Z"
+    },
+    {
+      "id": "inv066",
+      "companyId": "c052",
+      "siteName": "その他諸工事",
+      "invoiceDate": "2026-04-20",
+      "workType": "保温",
+      "amount": 638000,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.278Z"
+    },
+    {
+      "id": "inv067",
+      "companyId": "c068",
+      "siteName": "日新上野",
+      "invoiceDate": "2026-04-20",
+      "workType": "ﾀﾞｸﾄ",
+      "amount": 27500,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.278Z"
+    },
+    {
+      "id": "inv068",
+      "companyId": "c068",
+      "siteName": "Oishii Farm",
+      "invoiceDate": "2026-04-20",
+      "workType": "ﾀﾞｸﾄ",
+      "amount": 5060000,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.278Z"
+    },
+    {
+      "id": "inv069",
+      "companyId": "c071",
+      "siteName": "渋谷駅橋上駅舎",
+      "invoiceDate": "2026-04-20",
+      "workType": "管材",
+      "amount": 7260,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.278Z"
+    },
+    {
+      "id": "inv070",
+      "companyId": "c078",
+      "siteName": "その他諸工事",
+      "invoiceDate": "2026-04-20",
+      "workType": "日報管理",
+      "amount": 5940,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.278Z"
+    },
+    {
+      "id": "inv071",
+      "companyId": "c083",
+      "siteName": "その他諸工事",
+      "invoiceDate": "2026-04-20",
+      "workType": "工事",
+      "amount": 44000,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.278Z"
+    },
+    {
+      "id": "inv072",
+      "companyId": "c086",
+      "siteName": "小田急町田",
+      "invoiceDate": "2026-04-20",
+      "workType": "塗装・表示",
+      "amount": 220000,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.278Z"
+    },
+    {
+      "id": "inv073",
+      "companyId": "c094",
+      "siteName": "新橋駅改良工事",
+      "invoiceDate": "2026-04-20",
+      "workType": "代理店",
+      "amount": 2640000,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.278Z"
+    },
+    {
+      "id": "inv074",
+      "companyId": "c099",
+      "siteName": "その他諸工事",
+      "invoiceDate": "2026-04-20",
+      "workType": "仮設材",
+      "amount": 38500,
+      "paymentMonth": "2026-06",
+      "createdAt": "2026-05-21T10:04:59.278Z"
+    },
+    {
+      "id": "inv075",
+      "companyId": "c037",
+      "siteName": "その他諸工事",
+      "invoiceDate": "2026-05-20",
+      "workType": "ﾀﾞﾝﾊﾟｰ",
+      "amount": 47520,
+      "paymentMonth": "2026-07",
+      "createdAt": "2026-05-21T10:04:59.287Z"
     }
   ],
   "settings": {
