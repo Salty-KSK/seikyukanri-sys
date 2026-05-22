@@ -159,6 +159,8 @@
   let appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
   let currentListMonth = '';
   let editingCompanyId = null;
+  let currentNoticeCompanyId = null;
+  let currentNoticeMonth = null;
 
   // ----------------------------------------------------------
   // データ管理 (Google Apps Script + localStorage キャッシュ)
@@ -1054,42 +1056,193 @@
   // 支払通知発行セクション
   // ----------------------------------------------------------
   function initPaymentNotice() {
-    document.getElementById('btn-preview-notice').addEventListener('click', previewNotice);
-    document.getElementById('btn-generate-pdf').addEventListener('click', generatePdf);
+    // 支払月変更イベント
+    document.getElementById('notice-month').addEventListener('change', () => {
+      renderNoticeCompanyList();
+      // プレビューをクリア
+      document.getElementById('notice-preview-container').classList.add('hidden');
+      document.getElementById('notice-preview').innerHTML = '';
+      currentNoticeCompanyId = null;
+      currentNoticeMonth = null;
+    });
 
-    // デフォルト月を設定
+    // 検索窓入力イベント（インクリメンタルサーチ）
+    document.getElementById('notice-search').addEventListener('input', () => {
+      const query = document.getElementById('notice-search').value.toLowerCase().trim();
+      const rows = document.querySelectorAll('#notice-company-list tr');
+      let visibleCount = 0;
+
+      rows.forEach((row) => {
+        const name = row.getAttribute('data-name').toLowerCase();
+        const kana = row.getAttribute('data-kana').toLowerCase();
+        if (name.includes(query) || kana.includes(query)) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      const emptyEl = document.getElementById('notice-empty');
+      if (visibleCount === 0 && rows.length > 0) {
+        emptyEl.textContent = '検索条件に一致する業者はありません';
+        emptyEl.classList.remove('hidden');
+      } else if (rows.length === 0) {
+        emptyEl.textContent = 'この月の支払い対象業者はありません';
+        emptyEl.classList.remove('hidden');
+      } else {
+        emptyEl.classList.add('hidden');
+      }
+    });
+
+    // プレビュー内のPDF出力ボタン
+    document.getElementById('btn-generate-pdf').addEventListener('click', () => {
+      if (currentNoticeCompanyId && currentNoticeMonth) {
+        generatePdf(currentNoticeCompanyId, currentNoticeMonth);
+      }
+    });
+
+    // デフォルト月を設定（今月）
     const now = new Date();
     document.getElementById('notice-month').value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   }
 
   function refreshNoticeSection() {
-    const select = document.getElementById('notice-company');
-    const companies = [...appData.companies].sort(sortByCompanyKana);
+    document.getElementById('notice-search').value = '';
+    // プレビューをクリア
+    document.getElementById('notice-preview-container').classList.add('hidden');
+    document.getElementById('notice-preview').innerHTML = '';
+    currentNoticeCompanyId = null;
+    currentNoticeMonth = null;
 
-    select.innerHTML = '<option value="">会社を選択してください</option>';
-    companies.forEach((c) => {
-      select.innerHTML += `<option value="${c.id}">${escapeHtml(c.name)}</option>`;
-    });
+    renderNoticeCompanyList();
   }
 
-  function previewNotice() {
-    const companyId = document.getElementById('notice-company').value;
+  // 支払い対象業者一覧テーブルの描画
+  function renderNoticeCompanyList() {
     const month = document.getElementById('notice-month').value;
+    const listBody = document.getElementById('notice-company-list');
+    const emptyEl = document.getElementById('notice-empty');
 
-    if (!companyId || !month) {
-      showToast('会社と支払月を選択してください', 'error');
+    listBody.innerHTML = '';
+
+    if (!month) {
+      emptyEl.textContent = '支払月を選択してください';
+      emptyEl.classList.remove('hidden');
       return;
     }
+
+    // その月に支払いがある請求データをフィルタリング
+    const monthInvoices = appData.invoices.filter((i) => i.paymentMonth === month);
+
+    if (monthInvoices.length === 0) {
+      emptyEl.textContent = 'この月の支払い対象業者はありません';
+      emptyEl.classList.remove('hidden');
+      return;
+    }
+
+    emptyEl.classList.add('hidden');
+
+    // 業者ごとに集計
+    const companySummary = {}; // companyId => { total: 0, count: 0 }
+    monthInvoices.forEach((inv) => {
+      if (!companySummary[inv.companyId]) {
+        companySummary[inv.companyId] = { total: 0, count: 0 };
+      }
+      companySummary[inv.companyId].total += inv.amount;
+      companySummary[inv.companyId].count += 1;
+    });
+
+    // 対象の業者オブジェクトをフリガナ順にソートして取得
+    const activeCompanies = [];
+    Object.keys(companySummary).forEach((companyId) => {
+      const company = appData.companies.find((c) => c.id === companyId);
+      if (company) {
+        activeCompanies.push({
+          ...company,
+          totalAmount: companySummary[companyId].total,
+          invoiceCount: companySummary[companyId].count
+        });
+      }
+    });
+
+    activeCompanies.sort(sortByCompanyKana);
+
+    // テーブル行の生成
+    activeCompanies.forEach((c) => {
+      const statusKey = `payment_notice_status_${month}_${c.id}`;
+      const isIssued = localStorage.getItem(statusKey) === 'issued';
+
+      const tr = document.createElement('tr');
+      tr.setAttribute('data-name', c.name || '');
+      tr.setAttribute('data-kana', c.kana || '');
+
+      tr.innerHTML = `
+        <td>
+          <span class="status-badge ${isIssued ? 'issued' : 'unissued'}">
+            ${isIssued ? '発行済' : '未発行'}
+          </span>
+        </td>
+        <td style="font-weight: 600;">${escapeHtml(c.name)}</td>
+        <td class="amount">¥${formatAmount(c.totalAmount)}</td>
+        <td class="text-center">${c.invoiceCount}</td>
+        <td class="text-center">
+          <button class="btn btn-secondary btn-sm btn-row-preview" data-id="${c.id}">プレビュー</button>
+          <button class="btn btn-primary btn-sm btn-row-pdf" data-id="${c.id}">PDF出力</button>
+        </td>
+      `;
+
+      // イベントリスナーの追加
+      tr.querySelector('.btn-row-preview').addEventListener('click', (e) => {
+        e.stopPropagation();
+        previewNotice(c.id, month);
+      });
+
+      tr.querySelector('.btn-row-pdf').addEventListener('click', (e) => {
+        e.stopPropagation();
+        generatePdf(c.id, month);
+      });
+
+      listBody.appendChild(tr);
+    });
+
+    // 検索窓がすでに入力されている場合はフィルターを適用
+    const query = document.getElementById('notice-search').value.toLowerCase().trim();
+    if (query) {
+      const rows = listBody.querySelectorAll('tr');
+      let visibleCount = 0;
+      rows.forEach((row) => {
+        const name = row.getAttribute('data-name').toLowerCase();
+        const kana = row.getAttribute('data-kana').toLowerCase();
+        if (name.includes(query) || kana.includes(query)) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+      if (visibleCount === 0) {
+        emptyEl.textContent = '検索条件に一致する業者はありません';
+        emptyEl.classList.remove('hidden');
+      }
+    }
+  }
+
+  function previewNotice(companyId, month) {
+    if (!companyId || !month) return;
 
     const company = appData.companies.find((c) => c.id === companyId);
     const invoices = appData.invoices.filter(
       (i) => i.companyId === companyId && i.paymentMonth === month
     );
 
-    if (invoices.length === 0) {
-      showToast('該当する請求データがありません', 'error');
+    if (!company || invoices.length === 0) {
+      showToast('該当するデータがありません', 'error');
       return;
     }
+
+    currentNoticeCompanyId = companyId;
+    currentNoticeMonth = month;
 
     const settings = appData.settings;
     const taxRate = settings.taxRate / 100;
@@ -1197,19 +1350,30 @@
 
     preview.innerHTML = html;
     previewContainer.classList.remove('hidden');
+    previewContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  function generatePdf() {
-    const preview = document.getElementById('notice-preview');
-    if (!preview.innerHTML.trim()) {
-      showToast('まずプレビューを表示してください', 'error');
+  function generatePdf(companyId, month) {
+    if (!companyId || !month) {
+      showToast('会社と支払月が指定されていません', 'error');
       return;
     }
 
-    const companyId = document.getElementById('notice-company').value;
-    const month = document.getElementById('notice-month').value;
     const company = appData.companies.find((c) => c.id === companyId);
-    const fileName = `支払通知書_${company ? company.name : ''}_${monthToDisplay(month)}.pdf`;
+    if (!company) {
+      showToast('該当する会社が見つかりません', 'error');
+      return;
+    }
+
+    const preview = document.getElementById('notice-preview');
+    const previewContainer = document.getElementById('notice-preview-container');
+    const originalHtml = preview.innerHTML;
+    const isContainerOriginallyHidden = previewContainer.classList.contains('hidden');
+
+    // プレビューのレンダリング
+    previewNotice(companyId, month);
+
+    const fileName = `支払通知書_${company.name}_${monthToDisplay(month)}.pdf`;
 
     // 元のスタイルを一時退避
     const originalBorder = preview.style.border;
@@ -1230,12 +1394,12 @@
     preview.style.overflow = 'hidden';
 
     const opt = {
-      margin: 0, // マージンを0にして要素自体のpaddingでPDF内の余白を制御
+      margin: 0,
       filename: fileName,
-      image: { type: 'jpeg', quality: 1.0 }, // 最高画質
-      html2canvas: { scale: 4, useCORS: true, letterRendering: true }, // scaleを4に引き上げ画質のにじみを解消
+      image: { type: 'jpeg', quality: 1.0 },
+      html2canvas: { scale: 4, useCORS: true, letterRendering: true },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak: { mode: ['avoid-all'] } // 自動改ページを防ぐ
+      pagebreak: { mode: ['avoid-all'] }
     };
 
     showToast('PDF生成中...', 'info');
@@ -1249,8 +1413,27 @@
       preview.style.height = originalHeight;
       preview.style.minHeight = originalMinHeight;
       preview.style.overflow = originalOverflow;
+
+      // もし元々プレビューしていなかったなら元の表示に戻す
+      if (currentNoticeCompanyId !== companyId) {
+        if (isContainerOriginallyHidden) {
+          previewContainer.classList.add('hidden');
+          preview.innerHTML = '';
+        } else {
+          preview.innerHTML = originalHtml;
+        }
+      }
+
+      // 発行済みのステータスを localStorage に保存
+      const statusKey = `payment_notice_status_${month}_${companyId}`;
+      localStorage.setItem(statusKey, 'issued');
+
+      // 業者一覧テーブルを更新
+      renderNoticeCompanyList();
+
       showToast('PDFを出力しました');
     }).catch((err) => {
+      console.error(err);
       // エラー時もスタイルを元に戻す
       preview.style.border = originalBorder;
       preview.style.margin = originalMargin;
@@ -1259,6 +1442,17 @@
       preview.style.height = originalHeight;
       preview.style.minHeight = originalMinHeight;
       preview.style.overflow = originalOverflow;
+
+      // 元の表示に戻す
+      if (currentNoticeCompanyId !== companyId) {
+        if (isContainerOriginallyHidden) {
+          previewContainer.classList.add('hidden');
+          preview.innerHTML = '';
+        } else {
+          preview.innerHTML = originalHtml;
+        }
+      }
+
       showToast('PDF生成に失敗しました: ' + err.message, 'error');
     });
   }

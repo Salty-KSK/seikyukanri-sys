@@ -128,24 +128,48 @@
       <h2 class="section-title">支払通知発行</h2>
       <div class="form-grid">
         <div class="form-group">
-          <label class="form-label" for="notice-company">会社名</label>
-          <select id="notice-company" class="form-select">
-            <option value="">会社を選択してください</option>
-          </select>
-        </div>
-        <div class="form-group">
           <label class="form-label" for="notice-month">支払月</label>
           <input type="month" id="notice-month" class="form-input">
         </div>
-      </div>
-      <div class="btn-group mt-4">
-        <button id="btn-preview-notice" class="btn btn-secondary">プレビュー</button>
-        <button id="btn-generate-pdf" class="btn btn-primary">PDF出力</button>
+        <div class="form-group">
+          <label class="form-label" for="notice-search">業者名で検索</label>
+          <input type="text" id="notice-search" class="form-input" placeholder="会社名またはフリガナで検索...">
+        </div>
       </div>
     </div>
+
+    <!-- 支払い対象業者一覧テーブル -->
+    <div class="card">
+      <h3 class="section-subtitle" id="notice-list-title">支払い対象業者一覧</h3>
+      <div class="cross-table-container" style="max-height: 400px; overflow-y: auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width: 120px;">ステータス</th>
+              <th>会社名</th>
+              <th class="amount" style="width: 160px;">支払額合計</th>
+              <th class="text-center" style="width: 80px;">件数</th>
+              <th class="text-center" style="width: 200px;">操作</th>
+            </tr>
+          </thead>
+          <tbody id="notice-company-list">
+            <!-- JSで動的に追加されます -->
+          </tbody>
+        </table>
+      </div>
+      <div id="notice-empty" class="hidden" style="padding: 40px; text-align: center; color: #64748B;">この月の支払い対象業者はありません</div>
+    </div>
+
+    <!-- プレビュー表示 -->
     <div id="notice-preview-container" class="hidden">
-      <div id="notice-preview" class="notice-preview">
-        <!-- PDF content will be generated here -->
+      <div class="card">
+        <div class="flex-between mb-4" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <h3 class="section-subtitle" style="margin-bottom: 0;">支払通知書プレビュー</h3>
+          <button id="btn-generate-pdf" class="btn btn-primary">PDF出力</button>
+        </div>
+        <div id="notice-preview" class="notice-preview">
+          <!-- PDF content will be generated here -->
+        </div>
       </div>
     </div>
   </section>
