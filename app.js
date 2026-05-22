@@ -376,6 +376,12 @@
     return div.innerHTML;
   }
 
+  // 現場名から省略名称を取得するヘルパー関数
+  function getSiteShortName(siteName) {
+    const found = appData.invoices.find((i) => i.siteName === siteName && i.siteShortName);
+    return found ? found.siteShortName : siteName;
+  }
+
   // ----------------------------------------------------------
   // 請求入力セクション
   // ----------------------------------------------------------
@@ -435,6 +441,32 @@
       submitInvoice();
     });
 
+    // 現場名（正式）変更時：省略名の自動補完およびスマート提案
+    const siteInput = document.getElementById('input-site');
+    const siteShortInput = document.getElementById('input-site-short');
+    
+    const suggestSiteShortName = () => {
+      const siteName = siteInput.value.trim();
+      if (!siteName) return;
+      
+      // 過去データから省略名を探す（最新のものを優先）
+      const found = appData.invoices.slice().reverse().find(
+        (i) => i.siteName === siteName && i.siteShortName
+      );
+      
+      if (found) {
+        siteShortInput.value = found.siteShortName;
+      } else {
+        // 新規現場の場合のスマート推測
+        let guess = siteName.replace(/[\(（].*?[\)）]/g, '').trim();
+        guess = guess.replace(/(新築|改良|諸)?(工事|駅舎)$/, '');
+        siteShortInput.value = guess || siteName;
+      }
+    };
+
+    siteInput.addEventListener('change', suggestSiteShortName);
+    siteInput.addEventListener('blur', suggestSiteShortName);
+
     // クリアボタン
     document.getElementById('btn-clear-form').addEventListener('click', clearInvoiceForm);
 
@@ -445,12 +477,13 @@
   function submitInvoice() {
     const companyName = document.getElementById('input-company').value.trim();
     const siteName = document.getElementById('input-site').value.trim();
+    const siteShortName = document.getElementById('input-site-short').value.trim();
     const invoiceDate = document.getElementById('input-date').value;
     const workType = document.getElementById('input-work-type').value.trim();
     const amount = parseAmount(document.getElementById('input-amount').value);
     const paymentMonth = document.getElementById('input-payment-month').value;
 
-    if (!companyName || !siteName || !invoiceDate || !workType || !amount || !paymentMonth) {
+    if (!companyName || !siteName || !siteShortName || !invoiceDate || !workType || !amount || !paymentMonth) {
       showToast('すべての項目を入力してください', 'error');
       return;
     }
@@ -490,6 +523,7 @@
       if (invoice) {
         invoice.companyId = company.id;
         invoice.siteName = siteName;
+        invoice.siteShortName = siteShortName;
         invoice.invoiceDate = invoiceDate;
         invoice.workType = workType;
         invoice.amount = amount;
@@ -512,6 +546,7 @@
         id: generateId(),
         companyId: company.id,
         siteName,
+        siteShortName,
         invoiceDate,
         workType,
         amount,
@@ -530,6 +565,7 @@
   function clearInvoiceForm() {
     document.getElementById('input-company').value = '';
     document.getElementById('input-site').value = '';
+    document.getElementById('input-site-short').value = '';
     document.getElementById('input-work-type').value = '';
     document.getElementById('input-amount').value = '';
     const dateInput = document.getElementById('input-date');
@@ -606,6 +642,7 @@
     // フォームに値を復元
     document.getElementById('input-company').value = company ? company.name : '';
     document.getElementById('input-site').value = inv.siteName || '';
+    document.getElementById('input-site-short').value = inv.siteShortName || inv.siteName || '';
     document.getElementById('input-date').value = inv.invoiceDate || '';
     document.getElementById('input-work-type').value = inv.workType || '';
     document.getElementById('input-amount').value = formatAmount(inv.amount) || '';
@@ -822,7 +859,7 @@
     const thead = document.getElementById('cross-table-head');
     let headerHtml = '<tr><th>業者名</th><th>業種</th>';
     siteNames.forEach((site) => {
-      headerHtml += `<th>${escapeHtml(site)}</th>`;
+      headerHtml += `<th>${escapeHtml(getSiteShortName(site))}</th>`;
     });
     headerHtml += '<th>合計</th></tr>';
     thead.innerHTML = headerHtml;
@@ -916,7 +953,7 @@
     let csvContent = '';
 
     // ヘッダー行
-    const headers = ['業者名', '業種', ...siteNames, '合計'];
+    const headers = ['業者名', '業種', ...siteNames.map(getSiteShortName), '合計'];
     csvContent += headers.map(h => `"${h.replace(/"/g, '""')}"`).join(',') + '\r\n';
 
     // ボディ行
@@ -1021,7 +1058,7 @@
     h += '<th style="' + hc + 'width:' + nameW + 'px;">業者名</th>';
     h += '<th style="' + hc + 'width:' + indW + 'px;">業種</th>';
     siteNames.forEach((site) => {
-      h += '<th style="' + hc + 'width:' + colW + 'px;">' + escapeHtml(site) + '</th>';
+      h += '<th style="' + hc + 'width:' + colW + 'px;">' + escapeHtml(getSiteShortName(site)) + '</th>';
     });
     h += '<th style="' + hc + 'width:' + colW + 'px;">合計</th>';
     h += '</tr></thead>';
@@ -1106,17 +1143,43 @@
         <td>${formatDate(inv.invoiceDate)}</td>
         <td>${escapeHtml(inv.workType)}</td>
         <td class="amount">${formatAmount(inv.amount)}</td>
-        <td><button class="btn btn-danger btn-sm" data-del-inv="${inv.id}">削除</button></td>
+        <td>
+          <div style="display: flex; gap: 6px;">
+            <button class="btn btn-secondary btn-sm" data-edit-inv="${inv.id}">編集</button>
+            <button class="btn btn-danger btn-sm" data-del-inv="${inv.id}">削除</button>
+          </div>
+        </td>
       </tr>`;
     });
 
     html += '</tbody></table>';
     content.innerHTML = html;
 
+    // 編集ボタン
+    content.querySelectorAll('[data-edit-inv]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.editInv;
+        modal.classList.add('hidden'); // モーダルを閉じる
+
+        // 請求入力タブをアクティブにする
+        const inputTabBtn = document.querySelector('[data-tab="input"]');
+        if (inputTabBtn) {
+          inputTabBtn.click();
+        }
+
+        // 編集を開始する
+        startInvoiceEdit(id);
+      });
+    });
+
     // 削除ボタン
     content.querySelectorAll('[data-del-inv]').forEach((btn) => {
       btn.addEventListener('click', () => {
         if (confirm('この請求を削除しますか？')) {
+          // 削除対象が編集中なら編集状態を解除
+          if (editingInvoiceId === btn.dataset.delInv) {
+            cancelInvoiceEdit();
+          }
           appData.invoices = appData.invoices.filter((i) => i.id !== btn.dataset.delInv);
           saveToFile();
           refreshInvoiceList();
