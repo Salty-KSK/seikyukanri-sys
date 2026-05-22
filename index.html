@@ -79,7 +79,11 @@
             <input type="month" id="input-payment-month" class="form-input" required>
           </div>
         </div>
-        <div class="btn-group mt-4">
+        <div class="btn-group mt-4" style="display: flex; align-items: center; justify-content: flex-end; gap: 12px; flex-wrap: wrap;">
+          <span id="invoice-edit-status" class="hidden" style="color: #2563EB; font-weight: 600; font-size: 14px; margin-right: auto;">
+            💡 請求データを編集中です
+          </span>
+          <button type="button" id="btn-cancel-edit" class="btn btn-secondary hidden">編集キャンセル</button>
           <button type="button" id="btn-clear-form" class="btn btn-secondary">クリア</button>
           <button type="submit" id="btn-submit-invoice" class="btn btn-primary">登録</button>
         </div>

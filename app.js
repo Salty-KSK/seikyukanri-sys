@@ -161,6 +161,7 @@
   let editingCompanyId = null;
   let currentNoticeCompanyId = null;
   let currentNoticeMonth = null;
+  let editingInvoiceId = null;
 
   // ----------------------------------------------------------
   // データ管理 (Google Apps Script + localStorage キャッシュ)
@@ -436,6 +437,9 @@
 
     // クリアボタン
     document.getElementById('btn-clear-form').addEventListener('click', clearInvoiceForm);
+
+    // 編集キャンセルボタン
+    document.getElementById('btn-cancel-edit').addEventListener('click', cancelInvoiceEdit);
   }
 
   function submitInvoice() {
@@ -480,23 +484,47 @@
       appData.workTypes.push(workType);
     }
 
-    // 請求データ追加
-    const invoice = {
-      id: generateId(),
-      companyId: company.id,
-      siteName,
-      invoiceDate,
-      workType,
-      amount,
-      paymentMonth,
-      createdAt: new Date().toISOString(),
-    };
-    appData.invoices.push(invoice);
+    if (editingInvoiceId) {
+      // 既存の請求データを更新
+      const invoice = appData.invoices.find((i) => i.id === editingInvoiceId);
+      if (invoice) {
+        invoice.companyId = company.id;
+        invoice.siteName = siteName;
+        invoice.invoiceDate = invoiceDate;
+        invoice.workType = workType;
+        invoice.amount = amount;
+        invoice.paymentMonth = paymentMonth;
+      }
 
-    saveToFile();
-    clearInvoiceForm();
-    refreshRecentInvoices();
-    showToast(`${companyName} の請求を登録しました`);
+      // 編集状態のクリア
+      editingInvoiceId = null;
+      document.getElementById('btn-submit-invoice').textContent = '登録';
+      document.getElementById('invoice-edit-status').classList.add('hidden');
+      document.getElementById('btn-cancel-edit').classList.add('hidden');
+
+      saveToFile();
+      clearInvoiceForm();
+      refreshRecentInvoices();
+      showToast(`${companyName} の請求を更新しました`);
+    } else {
+      // 請求データ新規追加
+      const invoice = {
+        id: generateId(),
+        companyId: company.id,
+        siteName,
+        invoiceDate,
+        workType,
+        amount,
+        paymentMonth,
+        createdAt: new Date().toISOString(),
+      };
+      appData.invoices.push(invoice);
+
+      saveToFile();
+      clearInvoiceForm();
+      refreshRecentInvoices();
+      showToast(`${companyName} の請求を登録しました`);
+    }
   }
 
   function clearInvoiceForm() {
@@ -533,6 +561,7 @@
         <td class="amount">${formatAmount(inv.amount)}</td>
         <td>${monthToDisplay(inv.paymentMonth)}</td>
         <td>
+          <button class="btn btn-secondary btn-sm" data-edit-invoice="${inv.id}">編集</button>
           <button class="btn btn-danger btn-sm" data-delete-invoice="${inv.id}">削除</button>
         </td>
       </tr>`;
@@ -541,10 +570,21 @@
     html += '</tbody></table>';
     container.innerHTML = html;
 
+    // 編集ボタン
+    container.querySelectorAll('[data-edit-invoice]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        startInvoiceEdit(btn.dataset.editInvoice);
+      });
+    });
+
     // 削除ボタン
     container.querySelectorAll('[data-delete-invoice]').forEach((btn) => {
       btn.addEventListener('click', () => {
         if (confirm('この請求を削除しますか？')) {
+          // 削除対象が編集中なら編集状態を解除
+          if (editingInvoiceId === btn.dataset.deleteInvoice) {
+            cancelInvoiceEdit();
+          }
           appData.invoices = appData.invoices.filter((i) => i.id !== btn.dataset.deleteInvoice);
           saveToFile();
           refreshRecentInvoices();
@@ -552,6 +592,43 @@
         }
       });
     });
+  }
+
+  function startInvoiceEdit(id) {
+    const inv = appData.invoices.find((i) => i.id === id);
+    if (!inv) return;
+
+    editingInvoiceId = id;
+
+    // 会社名取得
+    const company = appData.companies.find((c) => c.id === inv.companyId);
+
+    // フォームに値を復元
+    document.getElementById('input-company').value = company ? company.name : '';
+    document.getElementById('input-site').value = inv.siteName || '';
+    document.getElementById('input-date').value = inv.invoiceDate || '';
+    document.getElementById('input-work-type').value = inv.workType || '';
+    document.getElementById('input-amount').value = formatAmount(inv.amount) || '';
+    document.getElementById('input-payment-month').value = inv.paymentMonth || '';
+
+    // UI更新
+    document.getElementById('btn-submit-invoice').textContent = '更新';
+    document.getElementById('invoice-edit-status').classList.remove('hidden');
+    document.getElementById('btn-cancel-edit').classList.remove('hidden');
+
+    // スムーズスクロール
+    document.getElementById('invoice-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function cancelInvoiceEdit() {
+    editingInvoiceId = null;
+
+    // UIリセット
+    document.getElementById('btn-submit-invoice').textContent = '登録';
+    document.getElementById('invoice-edit-status').classList.add('hidden');
+    document.getElementById('btn-cancel-edit').classList.add('hidden');
+
+    clearInvoiceForm();
   }
 
   // ----------------------------------------------------------
