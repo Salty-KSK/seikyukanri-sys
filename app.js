@@ -479,17 +479,21 @@
     siteInput.addEventListener('blur', () => checkDuplicateInvoice());
     amountInput.addEventListener('change', () => checkDuplicateInvoice());
     amountInput.addEventListener('blur', () => checkDuplicateInvoice());
+    dateInput.addEventListener('change', () => checkDuplicateInvoice());
+    paymentInput.addEventListener('change', () => checkDuplicateInvoice());
   }
 
   function checkDuplicateInvoice(silent = false) {
     const companyName = document.getElementById('input-company').value.trim();
     const siteName = document.getElementById('input-site').value.trim();
     const amount = parseAmount(document.getElementById('input-amount').value);
+    const invoiceDate = document.getElementById('input-date').value;
+    const paymentMonth = document.getElementById('input-payment-month').value;
     
     const alertEl = document.getElementById('invoice-duplicate-alert');
     if (!alertEl) return false;
     
-    if (!companyName || !siteName || !amount) {
+    if (!companyName || !siteName || !amount || !invoiceDate || !paymentMonth) {
       if (!silent) alertEl.classList.add('hidden');
       return false;
     }
@@ -501,18 +505,22 @@
       return false;
     }
     
-    // 重複をスキャン (編集中の自分自身は除外)
+    // 重複をスキャン (編集中の自分自身は除外 ＆ 同じ請求月 ＆ 同じ支払月)
+    const currentInvoiceMonth = invoiceDate.substring(0, 7); // YYYY-MM
+    
     const duplicate = appData.invoices.find(
       (inv) => 
         inv.id !== editingInvoiceId && 
         inv.companyId === company.id && 
         inv.siteName === siteName && 
-        inv.amount === amount
+        inv.amount === amount &&
+        inv.paymentMonth === paymentMonth &&
+        (inv.invoiceDate || '').substring(0, 7) === currentInvoiceMonth
     );
     
     if (duplicate) {
       if (!silent) {
-        alertEl.innerHTML = `⚠️ <strong>重複警告:</strong> 同一の会社・現場・金額の請求データが、既に <strong>${monthToDisplay(duplicate.paymentMonth)}分</strong>（請求日: ${formatDate(duplicate.invoiceDate)}）として登録されています。二重登録の可能性があります。`;
+        alertEl.innerHTML = `⚠️ <strong>重複警告:</strong> 同一の請求月（<strong>${monthToDisplay(currentInvoiceMonth)}</strong>）および支払月（<strong>${monthToDisplay(paymentMonth)}分</strong>）で、同一現場・金額の請求データが既に登録されています。二重登録の可能性があります。`;
         alertEl.classList.remove('hidden');
       }
       return true;
