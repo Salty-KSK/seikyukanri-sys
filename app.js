@@ -472,6 +472,56 @@
 
     // 編集キャンセルボタン
     document.getElementById('btn-cancel-edit').addEventListener('click', cancelInvoiceEdit);
+
+    // 重複チェック用入力監視イベント
+    companyInput.addEventListener('change', () => checkDuplicateInvoice());
+    siteInput.addEventListener('change', () => checkDuplicateInvoice());
+    siteInput.addEventListener('blur', () => checkDuplicateInvoice());
+    amountInput.addEventListener('change', () => checkDuplicateInvoice());
+    amountInput.addEventListener('blur', () => checkDuplicateInvoice());
+  }
+
+  function checkDuplicateInvoice(silent = false) {
+    const companyName = document.getElementById('input-company').value.trim();
+    const siteName = document.getElementById('input-site').value.trim();
+    const amount = parseAmount(document.getElementById('input-amount').value);
+    
+    const alertEl = document.getElementById('invoice-duplicate-alert');
+    if (!alertEl) return false;
+    
+    if (!companyName || !siteName || !amount) {
+      if (!silent) alertEl.classList.add('hidden');
+      return false;
+    }
+    
+    // 会社名からIDを引く
+    const company = appData.companies.find((c) => c.name === companyName);
+    if (!company) {
+      if (!silent) alertEl.classList.add('hidden');
+      return false;
+    }
+    
+    // 重複をスキャン (編集中の自分自身は除外)
+    const duplicate = appData.invoices.find(
+      (inv) => 
+        inv.id !== editingInvoiceId && 
+        inv.companyId === company.id && 
+        inv.siteName === siteName && 
+        inv.amount === amount
+    );
+    
+    if (duplicate) {
+      if (!silent) {
+        alertEl.innerHTML = `⚠️ <strong>重複警告:</strong> 同一の会社・現場・金額の請求データが、既に <strong>${monthToDisplay(duplicate.paymentMonth)}分</strong>（請求日: ${formatDate(duplicate.invoiceDate)}）として登録されています。二重登録の可能性があります。`;
+        alertEl.classList.remove('hidden');
+      }
+      return true;
+    } else {
+      if (!silent) {
+        alertEl.classList.add('hidden');
+      }
+      return false;
+    }
   }
 
   function submitInvoice() {
@@ -486,6 +536,14 @@
     if (!companyName || !siteName || !siteShortName || !invoiceDate || !workType || !amount || !paymentMonth) {
       showToast('すべての項目を入力してください', 'error');
       return;
+    }
+
+    // 同一支払月・同一現場・同一金額の重複登録警告
+    const isDuplicate = checkDuplicateInvoice(true);
+    if (isDuplicate) {
+      if (!confirm(`⚠️【重複登録警告】\n同じ会社・現場・金額の請求データが既に登録されています。\n本当にこのまま登録（または更新）しますか？`)) {
+        return;
+      }
     }
 
     // 会社が未登録なら簡易登録
@@ -505,6 +563,8 @@
         branchName: '',
         accountType: '普通',
         accountNumber: '',
+        contactPerson: '',
+        email: '',
       };
       appData.companies.push(company);
     }
@@ -571,6 +631,10 @@
     const dateInput = document.getElementById('input-date');
     dateInput.value = new Date().toISOString().split('T')[0];
     document.getElementById('input-payment-month').value = getPaymentMonthDefault(dateInput.value);
+    
+    // 重複警告の非表示化
+    const alertEl = document.getElementById('invoice-duplicate-alert');
+    if (alertEl) alertEl.classList.add('hidden');
   }
 
   function refreshRecentInvoices() {
@@ -666,6 +730,10 @@
     document.getElementById('btn-cancel-edit').classList.add('hidden');
 
     clearInvoiceForm();
+    
+    // 重複警告非表示化
+    const alertEl = document.getElementById('invoice-duplicate-alert');
+    if (alertEl) alertEl.classList.add('hidden');
   }
 
   // ----------------------------------------------------------
@@ -718,12 +786,16 @@
         document.getElementById('company-branch').value = c.branchName || '';
         document.getElementById('company-account-type').value = c.accountType || '普通';
         document.getElementById('company-account-num').value = c.accountNumber || '';
+        document.getElementById('company-contact-person').value = c.contactPerson || '';
+        document.getElementById('company-email').value = c.email || '';
       }
     } else {
       titleEl.textContent = '会社情報登録';
       document.getElementById('company-form').reset();
       document.getElementById('company-name').value = name || '';
       document.getElementById('company-kana').value = hankakuToZenkaku(name || '');
+      document.getElementById('company-contact-person').value = '';
+      document.getElementById('company-email').value = '';
     }
 
     modal.classList.remove('hidden');
@@ -759,6 +831,8 @@
       branchName: document.getElementById('company-branch').value.trim(),
       accountType: document.getElementById('company-account-type').value,
       accountNumber: document.getElementById('company-account-num').value.trim(),
+      contactPerson: document.getElementById('company-contact-person').value.trim(),
+      email: document.getElementById('company-email').value.trim(),
     };
 
     if (editingCompanyId) {
@@ -1652,7 +1726,7 @@
 
     let html = `<table class="data-table">
       <thead><tr>
-        <th>会社名</th><th>フリガナ</th><th>業種</th><th>電話番号</th><th>銀行</th><th>操作</th>
+        <th>会社名</th><th>フリガナ</th><th>業種</th><th>担当者</th><th>電話番号</th><th>銀行</th><th>操作</th>
       </tr></thead><tbody>`;
 
     companies.forEach((c) => {
@@ -1660,6 +1734,7 @@
         <td>${escapeHtml(c.name)}</td>
         <td>${escapeHtml(c.kana || '—')}</td>
         <td>${escapeHtml(c.industry || '—')}</td>
+        <td>${escapeHtml(c.contactPerson || '—')}</td>
         <td>${escapeHtml(c.tel || '—')}</td>
         <td>${escapeHtml(c.bankName ? `${c.bankName}/${c.branchName || ''}` : '—')}</td>
         <td>

@@ -83,6 +83,7 @@
             <input type="month" id="input-payment-month" class="form-input" required>
           </div>
         </div>
+        <div id="invoice-duplicate-alert" class="alert alert-warning hidden mt-4" style="margin-bottom: 0; width: 100%;"></div>
         <div class="btn-group mt-4" style="display: flex; align-items: center; justify-content: flex-end; gap: 12px; flex-wrap: wrap;">
           <span id="invoice-edit-status" class="hidden" style="color: #2563EB; font-weight: 600; font-size: 14px; margin-right: auto;">
             💡 請求データを編集中です
@@ -255,6 +256,14 @@
         <div class="form-group full-width">
           <label class="form-label" for="company-kana">フリガナ（あいうえお順用） <span style="color:#DC2626">*</span></label>
           <input type="text" id="company-kana" class="form-input" placeholder="例: アイスコンフォート" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="company-contact-person">担当者</label>
+          <input type="text" id="company-contact-person" class="form-input" placeholder="担当者名を入力">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="company-email">メールアドレス</label>
+          <input type="email" id="company-email" class="form-input" placeholder="example@domain.com">
         </div>
         <div class="form-group">
           <label class="form-label" for="company-industry">業種</label>
