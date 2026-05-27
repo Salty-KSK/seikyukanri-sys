@@ -386,7 +386,7 @@
   // タブナビゲーション
   // ----------------------------------------------------------
   function initTabs() {
-    const buttons = document.querySelectorAll('.tab-btn');
+    const buttons = document.querySelectorAll('.nav-item');
     const contents = document.querySelectorAll('.tab-content');
 
     buttons.forEach((btn) => {

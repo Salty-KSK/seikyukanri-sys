@@ -1,9 +1,24 @@
 /* ============================================
    請求管理ツール | パル設計
-   index.css
+   Google Workspace (Material 3) テーマ index.css
    ============================================ */
 
-/* --- Google Fonts (imported via HTML <link>) --- */
+/* ============================================
+   Material 3 CSS カスタムプロパティ (カラーシステム)
+   ============================================ */
+:root {
+  --google-bg: #F0F4F9;             /* Google Workspaceの標準薄グレー背景 */
+  --google-surface: #FFFFFF;        /* カード、パネル、入力欄の白色背景 */
+  --google-primary: #0B57D0;        /* Google Workspaceのシグネチャーブルー */
+  --google-active-pill: #D3E3FD;    /* 選択中のメニューカプセル背景 */
+  --google-hover-pill: #E1E9F6;     /* ホバー時のメニューカプセル背景 */
+  --google-text-main: #1F1F1F;      /* Gmailなどでも使用される標準の墨色 */
+  --google-text-sub: #5E5E5E;       /* サブ情報テキスト用のグレー */
+  --google-border: #C7C7C7;         /* Google標準の入力欄ボーダー */
+  --google-border-light: #E3E3E3;   /* テーブル境界線などの超極薄グレー */
+  --google-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15); /* 柔らかいマテリアルシャドウ */
+  --google-transition: all 0.2s cubic-bezier(0.2, 0, 0, 1); /* Google標準の滑らかなイージング */
+}
 
 /* ============================================
    リセット・ベース
@@ -16,123 +31,150 @@
 
 body {
   font-family: 'Noto Sans JP', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: #F8FAFC;
-  color: #1E293B;
+  background-color: var(--google-bg);
+  color: var(--google-text-main);
   font-size: 14px;
   line-height: 1.6;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* ============================================
-   ヘッダー .app-header
+   2カラムレイアウト構造 (Material 3 ダッシュボード)
    ============================================ */
-.app-header {
-  background-color: #FFFFFF;
-  border-bottom: 1px solid #E2E8F0;
-  padding: 16px 24px;
-}
-
-.header-content {
-  max-width: 1280px;
-  margin: 0 auto;
+.app-layout {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  min-height: 100vh;
+  background-color: var(--google-bg);
 }
 
-.app-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: #1E293B;
+/* 左サイドバー (Navigation Drawer) */
+.app-sidebar {
+  width: 256px;
+  background-color: var(--google-bg);
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
+  user-select: none;
 }
 
-.header-actions {
+.sidebar-brand {
   display: flex;
   align-items: center;
   gap: 12px;
+  padding: 20px 12px;
+  margin-bottom: 12px;
 }
 
-.data-status {
+.brand-icon {
+  font-size: 28px !important;
+  color: var(--google-primary);
+  font-variation-settings: 'FILL' 1;
+}
+
+.brand-text {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--google-text-main);
+  letter-spacing: -0.2px;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ナビゲーションメニュー項目 (カプセルホバーエフェクト) */
+.nav-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: #64748B;
-}
-
-.data-status .status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  display: inline-block;
-}
-
-.data-status.connected .status-dot {
-  background-color: #059669;
-}
-
-.data-status.connected .status-text {
-  color: #059669;
-}
-
-.data-status.disconnected .status-dot {
-  background-color: #DC2626;
-}
-
-.data-status.disconnected .status-text {
-  color: #DC2626;
-}
-
-.data-status.syncing .status-dot {
-  background-color: #D97706;
-  animation: pulse 1s infinite;
-}
-
-.data-status.syncing .status-text {
-  color: #D97706;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
-
-/* ============================================
-   タブナビゲーション .tab-nav
-   ============================================ */
-.tab-nav {
-  background-color: #FFFFFF;
-  border-bottom: 1px solid #E2E8F0;
-  display: flex;
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 24px;
-  overflow-x: auto;
-}
-
-.tab-btn {
-  padding: 14px 20px;
+  gap: 16px;
+  width: 100%;
+  padding: 14px 24px;
   border: none;
-  border-bottom: 3px solid transparent;
   background: none;
   font-size: 14px;
   font-weight: 500;
-  color: #64748B;
+  color: var(--google-text-sub);
   cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
+  border-radius: 100px; /* 角を完全に丸めたカプセル形状 */
+  transition: var(--google-transition);
   font-family: inherit;
+  text-align: left;
 }
 
-.tab-btn:hover {
-  background-color: #EFF6FF;
-  color: #2563EB;
+.nav-icon {
+  font-size: 22px !important;
+  transition: transform 0.2s var(--google-transition);
 }
 
-.tab-btn.active {
-  border-bottom-color: #2563EB;
-  color: #2563EB;
+/* ホバー時: 淡いブルーの丸角カプセル背景 */
+.nav-item:hover {
+  background-color: var(--google-hover-pill);
+  color: var(--google-text-main);
+}
+
+.nav-item:hover .nav-icon {
+  transform: scale(1.06);
+}
+
+/* 選択時 (アクティブ): 美しいペールブルー背景 ＆ 塗りつぶしアイコン */
+.nav-item.active {
+  background-color: var(--google-active-pill);
+  color: var(--google-primary);
   font-weight: 600;
+}
+
+.nav-item.active .nav-icon {
+  font-variation-settings: 'FILL' 1;
+  color: var(--google-primary);
+}
+
+/* 右側コンテンツコンテナ */
+.app-container {
+  flex: 1;
+  margin-left: 256px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* 薄型ミニマルヘッダー */
+.main-header {
+  background-color: var(--google-bg);
+  padding: 12px 24px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 56px;
+}
+
+/* メメインコンテンツエリア */
+.main-content {
+  padding: 8px 24px 24px 24px;
+  flex: 1;
+}
+
+/* ============================================
+   マテリアルカード (Material 3 Container)
+   ============================================ */
+.card {
+  background-color: var(--google-surface);
+  border-radius: 24px; /* Material 3 コンテナ標準の大きな丸角 */
+  padding: 28px;
+  margin-bottom: 20px;
+  border: 1px solid var(--google-border-light);
+  transition: box-shadow 0.2s var(--google-transition);
+}
+
+.card:hover {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 /* ============================================
@@ -144,41 +186,76 @@ body {
 
 .tab-content.active {
   display: block;
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn 0.3s cubic-bezier(0.2, 0, 0, 1);
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ============================================
-   メインコンテンツ
+   接続ステータス表示
    ============================================ */
-.main-content {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 24px;
+.data-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--google-text-sub);
+  padding: 6px 14px;
+  background-color: var(--google-surface);
+  border-radius: 100px;
+  border: 1px solid var(--google-border-light);
+}
+
+.data-status .status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.data-status.connected .status-dot {
+  background-color: #0F9D58; /* Google Green */
+}
+
+.data-status.connected .status-text {
+  color: #0F9D58;
+  font-weight: 500;
+}
+
+.data-status.disconnected .status-dot {
+  background-color: #DB4437; /* Google Red */
+}
+
+.data-status.disconnected .status-text {
+  color: #DB4437;
+  font-weight: 500;
+}
+
+.data-status.syncing .status-dot {
+  background-color: #F4B400; /* Google Yellow */
+  animation: pulse 1.2s infinite;
+}
+
+.data-status.syncing .status-text {
+  color: #F4B400;
+  font-weight: 500;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
 }
 
 /* ============================================
-   カード .card
-   ============================================ */
-.card {
-  background-color: #FFFFFF;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  padding: 24px;
-  margin-bottom: 24px;
-}
-
-/* ============================================
-   フォーム
+   フォーム設計 (Material 3 Input)
    ============================================ */
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 24px;
 }
 
 .form-group {
@@ -193,38 +270,37 @@ body {
 .form-label {
   display: block;
   font-size: 14px;
-  font-weight: 600;
-  color: #1E293B;
-  margin-bottom: 6px;
+  font-weight: 500;
+  color: var(--google-text-main);
+  margin-bottom: 8px;
+  padding-left: 4px;
 }
 
 .form-input,
 .form-select {
   width: 100%;
-  padding: 10px 14px;
-  border: 1px solid #E2E8F0;
-  border-radius: 8px;
+  padding: 12px 16px;
+  border: 1px solid var(--google-border);
+  border-radius: 12px; /* 少し大きめのモダンな丸角 */
   font-size: 14px;
   font-family: inherit;
-  color: #1E293B;
-  background-color: #FFFFFF;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  color: var(--google-text-main);
+  background-color: var(--google-surface);
+  transition: var(--google-transition);
 }
 
 .form-input:focus,
 .form-select:focus {
-  border-color: #2563EB;
+  border-color: var(--google-primary);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 0 0 2px rgba(11, 87, 208, 0.2); /* Googleブルーの柔らかい光彩 */
 }
 
 .form-input::placeholder {
-  color: #94A3B8;
+  color: #9E9E9E;
 }
 
-/* ============================================
-   オートコンプリート
-   ============================================ */
+/* オートコンプリート */
 .autocomplete-wrapper {
   position: relative;
 }
@@ -234,18 +310,18 @@ body {
   top: 100%;
   left: 0;
   right: 0;
-  background-color: #FFFFFF;
-  border: 1px solid #E2E8F0;
-  border-radius: 8px;
-  max-height: 200px;
+  background-color: var(--google-surface);
+  border: 1px solid var(--google-border-light);
+  border-radius: 12px;
+  max-height: 220px;
   overflow-y: auto;
   z-index: 100;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin-top: 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  margin-top: 6px;
 }
 
 .autocomplete-item {
-  padding: 10px 14px;
+  padding: 12px 16px;
   cursor: pointer;
   font-size: 14px;
   transition: background-color 0.15s;
@@ -253,58 +329,66 @@ body {
 
 .autocomplete-item:hover,
 .autocomplete-item.selected {
-  background-color: #EFF6FF;
+  background-color: var(--google-hover-pill);
+  color: var(--google-primary);
 }
 
 /* ============================================
-   ボタン
+   カプセルボタン (Pill Button)
    ============================================ */
 .btn {
-  padding: 10px 20px;
-  border-radius: 8px;
+  padding: 12px 24px;
+  border-radius: 100px; /* 完全な円柱形カプセルボタン */
   font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
   font-weight: 500;
+  cursor: pointer;
+  transition: var(--google-transition);
   border: none;
   font-family: inherit;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .btn-primary {
-  background-color: #2563EB;
-  color: #FFFFFF;
+  background-color: var(--google-primary);
+  color: var(--google-surface);
 }
 
 .btn-primary:hover {
-  background-color: #1D4ED8;
+  background-color: #0842a0; /* 少し深みのある青 */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 
 .btn-secondary {
-  background-color: #FFFFFF;
-  border: 1px solid #E2E8F0;
-  color: #1E293B;
+  background-color: var(--google-surface);
+  border: 1px solid var(--google-border);
+  color: var(--google-primary);
 }
 
 .btn-secondary:hover {
-  background-color: #F8FAFC;
+  background-color: var(--google-hover-pill);
+  border-color: var(--google-primary);
 }
 
 .btn-danger {
-  background-color: #DC2626;
-  color: #FFFFFF;
+  background-color: #DB4437; /* Google Red */
+  color: var(--google-surface);
 }
 
 .btn-danger:hover {
-  background-color: #B91C1C;
+  background-color: #c23b2e;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 
 .btn-sm {
-  padding: 6px 12px;
-  font-size: 12px;
+  padding: 8px 16px;
+  font-size: 13px;
+}
+
+.btn-icon {
+  font-size: 18px !important;
 }
 
 .btn-group {
@@ -314,7 +398,7 @@ body {
 }
 
 /* ============================================
-   テーブル（通常） .data-table
+   テーブルデザインの洗練
    ============================================ */
 .data-table {
   width: 100%;
@@ -322,37 +406,38 @@ body {
 }
 
 .data-table th {
-  background-color: #F1F5F9;
-  padding: 12px 16px;
+  background-color: #F8FAFC;
+  padding: 14px 20px;
   text-align: left;
   font-size: 13px;
   font-weight: 600;
-  color: #475569;
-  border-top: 1px solid #E2E8F0;
-  border-bottom: 1px solid #E2E8F0;
+  color: var(--google-text-sub);
+  border-top: 1px solid var(--google-border-light);
+  border-bottom: 1px solid var(--google-border-light);
 }
 
 .data-table td {
-  padding: 12px 16px;
-  border-bottom: 1px solid #E2E8F0;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--google-border-light);
   font-size: 14px;
 }
 
 .data-table tbody tr:hover {
-  background-color: #F8FAFC;
+  background-color: var(--google-bg);
 }
 
 .data-table .amount {
   text-align: right;
   font-family: 'Inter', sans-serif;
   font-variant-numeric: tabular-nums;
+  font-weight: 500;
 }
 
-/* ============================================
-   クロス集計テーブル .cross-table
-   ============================================ */
+/* クロス集計テーブル */
 .cross-table-container {
   overflow-x: auto;
+  border-radius: 16px;
+  border: 1px solid var(--google-border-light);
 }
 
 .cross-table {
@@ -362,18 +447,19 @@ body {
 
 .cross-table th,
 .cross-table td {
-  border: 1px solid #D1D5DB;
-  padding: 8px 12px;
+  border: 1px solid var(--google-border-light);
+  padding: 10px 14px;
   font-size: 13px;
 }
 
 .cross-table thead th {
-  background-color: #1E293B;
-  color: #FFFFFF;
-  font-weight: 600;
+  background-color: #1F1F1F;
+  color: var(--google-surface);
+  font-weight: 500;
   position: sticky;
   top: 0;
   z-index: 10;
+  border-top: none;
 }
 
 .cross-table .company-name-cell {
@@ -382,37 +468,402 @@ body {
   position: sticky;
   left: 0;
   z-index: 5;
+  border-left: none;
 }
 
 .cross-table .industry-cell {
   background-color: #F8FAFC;
   font-size: 12px;
-  color: #64748B;
+  color: var(--google-text-sub);
 }
 
 .cross-table .amount-cell {
   text-align: right;
   font-family: 'Inter', sans-serif;
   cursor: pointer;
+  transition: background-color 0.15s;
 }
 
 .cross-table .amount-cell:not(:empty):hover {
-  background-color: #EFF6FF;
+  background-color: var(--google-active-pill);
+  color: var(--google-primary);
+  font-weight: 600;
 }
 
 .cross-table .total-row td {
   font-weight: 700;
-  background-color: #F1F5F9;
-  border-top: 2px solid #1E293B;
+  background-color: var(--google-bg);
+  border-top: 2px solid var(--google-text-main);
+  border-bottom: none;
 }
 
 .cross-table .total-col {
   font-weight: 700;
-  background-color: #F1F5F9;
+  background-color: var(--google-bg);
 }
 
 /* ============================================
-   PDF出力用の特別テーブルスタイル（A3横表示サイズ固定用）
+   月選択コントロール
+   ============================================ */
+.month-selector {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.month-nav-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--google-border);
+  background-color: var(--google-surface);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--google-text-main);
+  transition: var(--google-transition);
+}
+
+.month-nav-btn:hover {
+  background-color: var(--google-hover-pill);
+  border-color: var(--google-primary);
+  color: var(--google-primary);
+}
+
+.month-display {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--google-text-main);
+  min-width: 130px;
+  text-align: center;
+}
+
+/* ============================================
+   支払通知プレビュー .notice-preview
+   ============================================ */
+.notice-preview {
+  background-color: #FFFFFF;
+  border: 1px solid var(--google-border);
+  width: 210mm;
+  min-height: 297mm;
+  margin: 24px auto 0;
+  padding: 15mm 20mm 20mm;
+  box-sizing: border-box;
+  font-size: 12px;
+  line-height: 1.7;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+}
+
+.notice-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 10px;
+  margin-bottom: 35px;
+  border-bottom: 2px solid var(--google-text-main);
+  padding-bottom: 12px;
+}
+
+.notice-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.notice-left,
+.notice-right {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.notice-company-name {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.notice-message {
+  margin: 20px 0;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.notice-summary-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--google-border);
+  border-radius: 8px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.notice-summary-table th,
+.notice-summary-table td {
+  border-bottom: 1px solid var(--google-border);
+  border-right: 1px solid var(--google-border);
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.notice-summary-table th:last-child,
+.notice-summary-table td:last-child {
+  border-right: none;
+}
+
+.notice-summary-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.notice-summary-table th {
+  background-color: #F8FAFC;
+  font-weight: 600;
+  text-align: center;
+}
+
+.notice-summary-table td {
+  text-align: left;
+}
+
+.notice-summary-table td.amount {
+  text-align: right;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+}
+
+.notice-detail-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-top: 28px;
+  margin-bottom: 10px;
+  color: var(--google-text-main);
+}
+
+.notice-detail-table {
+  width: 100%;
+  table-layout: auto;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--google-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.notice-detail-table th,
+.notice-detail-table td {
+  border-bottom: 1px solid var(--google-border);
+  border-right: 1px solid var(--google-border);
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.notice-detail-table th:last-child,
+.notice-detail-table td:last-child {
+  border-right: none;
+}
+
+.notice-detail-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.notice-detail-table th {
+  background-color: #F8FAFC;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.notice-detail-table .amount {
+  text-align: right;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ============================================
+   モーダル & アラート
+   ============================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.32); /* Google標準の半透明マスク */
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(2px); /* 緩やかなグラスブラー */
+}
+
+.modal {
+  background-color: var(--google-surface);
+  border-radius: 28px; /* Material 3 ダイアログの丸角 */
+  padding: 36px;
+  max-width: 620px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  border: 1px solid var(--google-border-light);
+  box-shadow: 0 12px 36px rgba(0,0,0,0.1);
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 24px;
+  color: var(--google-text-main);
+}
+
+.modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: none;
+  font-size: 20px;
+  color: var(--google-text-sub);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: var(--google-transition);
+}
+
+.modal-close:hover {
+  background-color: var(--google-hover-pill);
+  color: var(--google-text-main);
+}
+
+/* アラート */
+.alert {
+  padding: 14px 18px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.alert-success {
+  background-color: #E6F4EA;
+  color: #137333;
+  border: 1px solid #CEEAD6;
+}
+
+.alert-error {
+  background-color: #FCE8E6;
+  color: #C5221F;
+  border: 1px solid #FAD2CF;
+}
+
+.alert-info {
+  background-color: #E8F0FE;
+  color: #1A73E8;
+  border: 1px solid #D2E3FC;
+}
+
+.alert-warning {
+  background-color: #FEF7E0;
+  color: #B06000;
+  border: 1px solid #FEEFC3;
+}
+
+/* ============================================
+   設定セクション & 会社マスタ
+   ============================================ */
+.settings-section {
+  margin-bottom: 36px;
+}
+
+.settings-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--google-border-light);
+  color: var(--google-text-main);
+}
+
+.company-master-grid {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.company-master-grid th {
+  background-color: #F8FAFC;
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--google-text-sub);
+  border-bottom: 1px solid var(--google-border-light);
+}
+
+.company-master-grid td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--google-border-light);
+  font-size: 14px;
+}
+
+.company-master-grid tbody tr:hover {
+  background-color: var(--google-bg);
+}
+
+/* ステータスバッジ */
+.status-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 100px; /* カプセル型バッジ */
+  text-align: center;
+}
+.status-badge.unissued {
+  background-color: var(--google-bg);
+  color: var(--google-text-sub);
+}
+.status-badge.issued {
+  background-color: #E6F4EA;
+  color: #137333;
+}
+
+/* トースト通知 */
+.toast {
+  padding: 14px 24px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+  animation: fadeIn 0.3s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.toast-success {
+  background-color: #E6F4EA;
+  color: #137333;
+  border: 1px solid #CEEAD6;
+}
+
+.toast-error {
+  background-color: #FCE8E6;
+  color: #C5221F;
+  border: 1px solid #FAD2CF;
+}
+
+/* ユーティリティ */
+.mt-4 { margin-top: 16px; }
+.mb-4 { margin-bottom: 16px; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.hidden { display: none !important; }
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+
+/* ============================================
+   A3横PDF出力用の特別テーブルスタイル (A3横表示サイズ固定用)
    ============================================ */
 .pdf-export-container {
   padding: 15mm;
@@ -421,18 +872,18 @@ body {
   position: absolute;
   left: 0;
   top: 0;
-  z-index: -9999; /* 最背面に隠してユーザーの画面には表示しないようにする */
+  z-index: -9999;
   overflow: hidden;
 }
 
 .pdf-export-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   text-align: center;
-  margin-bottom: 15px;
-  color: #1E293B;
-  border-bottom: 2px solid #1E293B;
-  padding-bottom: 8px;
+  margin-bottom: 18px;
+  color: var(--google-text-main);
+  border-bottom: 2px solid var(--google-text-main);
+  padding-bottom: 10px;
 }
 
 .pdf-export-mode {
@@ -452,13 +903,12 @@ body {
 }
 
 .pdf-export-mode thead th {
-  background-color: #1E293B !important;
-  color: #FFFFFF !important;
+  background-color: #1F1F1F !important;
+  color: var(--google-surface) !important;
   font-weight: 600 !important;
   text-align: center !important;
 }
 
-/* 各列の絶対幅固定 */
 .pdf-export-mode .company-name-cell {
   width: 140px !important;
   min-width: 140px !important;
@@ -498,434 +948,121 @@ body {
   width: 110px !important;
   min-width: 110px !important;
   max-width: 110px !important;
-  background-color: #F1F5F9 !important;
+  background-color: var(--google-bg) !important;
   font-weight: 700 !important;
   text-align: right !important;
 }
 
 .pdf-export-mode .total-row td {
-  background-color: #F1F5F9 !important;
+  background-color: var(--google-bg) !important;
   font-weight: 700 !important;
-  border-top: 2px solid #1E293B !important;
+  border-top: 2px solid var(--google-text-main) !important;
 }
 
 /* ============================================
-   月選択 .month-selector
-   ============================================ */
-.month-selector {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.month-nav-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1px solid #E2E8F0;
-  background-color: #FFFFFF;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  color: #1E293B;
-  transition: all 0.2s;
-}
-
-.month-nav-btn:hover {
-  background-color: #F8FAFC;
-  border-color: #CBD5E1;
-}
-
-.month-display {
-  font-size: 18px;
-  font-weight: 700;
-  color: #1E293B;
-  min-width: 120px;
-  text-align: center;
-}
-
-/* ============================================
-   支払通知プレビュー .notice-preview
-   ============================================ */
-.notice-preview {
-  background-color: #FFFFFF;
-  border: 1px solid #D1D5DB;
-  width: 210mm;
-  min-height: 297mm;
-  margin: 24px auto 0;
-  padding: 10mm 15mm 15mm;
-  box-sizing: border-box;
-  font-size: 12px;
-  line-height: 1.7;
-}
-
-.notice-title {
-  text-align: center;
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: 8px;
-  margin-bottom: 30px;
-  border-bottom: 2px solid #1E293B;
-  padding-bottom: 10px;
-}
-
-.notice-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 30px;
-}
-
-.notice-left,
-.notice-right {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.notice-company-name {
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.notice-message {
-  margin: 20px 0;
-  font-size: 14px;
-  line-height: 1.8;
-}
-
-.notice-summary-table {
-  border-collapse: separate;
-  border-spacing: 0;
-  border: 1px solid #D1D5DB;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  overflow: hidden;
-}
-
-.notice-summary-table th,
-.notice-summary-table td {
-  border-bottom: 1px solid #D1D5DB;
-  border-right: 1px solid #D1D5DB;
-  padding: 5px 10px;
-  font-size: 13px;
-}
-
-.notice-summary-table th:last-child,
-.notice-summary-table td:last-child {
-  border-right: none;
-}
-
-.notice-summary-table tbody tr:last-child td {
-  border-bottom: none;
-}
-
-.notice-summary-table th {
-  background-color: #F1F5F9;
-  font-weight: 600;
-  text-align: center;
-}
-
-.notice-summary-table td {
-  text-align: left;
-}
-
-.notice-summary-table td.amount {
-  text-align: right;
-  font-family: 'Inter', sans-serif;
-}
-
-.notice-detail-title {
-  font-size: 14px;
-  font-weight: 700;
-  margin-top: 24px;
-  margin-bottom: 8px;
-  color: #1E293B;
-}
-
-.notice-detail-table {
-  width: 100%;
-  table-layout: auto;
-  border-collapse: separate;
-  border-spacing: 0;
-  border: 1px solid #D1D5DB;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.notice-detail-table th,
-.notice-detail-table td {
-  border-bottom: 1px solid #D1D5DB;
-  border-right: 1px solid #D1D5DB;
-  padding: 4px 10px;
-  font-size: 12px;
-}
-
-.notice-detail-table th:last-child,
-.notice-detail-table td:last-child {
-  border-right: none;
-}
-
-.notice-detail-table tbody tr:last-child td {
-  border-bottom: none;
-}
-
-.notice-detail-table th {
-  background-color: #F1F5F9;
-  font-weight: 600;
-  text-align: center;
-  white-space: nowrap;
-}
-
-.notice-detail-table .amount {
-  text-align: right;
-  font-family: 'Inter', sans-serif;
-}
-
-/* ============================================
-   モーダル .modal-overlay
-   ============================================ */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.4);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal {
-  background-color: #FFFFFF;
-  border-radius: 16px;
-  padding: 32px;
-  max-width: 600px;
-  width: 90%;
-  max-height: 80vh;
-  overflow-y: auto;
-  position: relative;
-}
-
-.modal-title {
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 24px;
-  color: #1E293B;
-}
-
-.modal-close {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: none;
-  font-size: 18px;
-  color: #64748B;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  transition: background-color 0.2s;
-}
-
-.modal-close:hover {
-  background-color: #F1F5F9;
-  color: #1E293B;
-}
-
-/* ============================================
-   アラート .alert
-   ============================================ */
-.alert {
-  padding: 12px 16px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  font-size: 14px;
-}
-
-.alert-success {
-  background-color: #ECFDF5;
-  color: #065F46;
-  border: 1px solid #A7F3D0;
-}
-
-.alert-error {
-  background-color: #FEF2F2;
-  color: #991B1B;
-  border: 1px solid #FECACA;
-}
-
-.alert-info {
-  background-color: #EFF6FF;
-  color: #1E40AF;
-  border: 1px solid #BFDBFE;
-}
-
-.alert-warning {
-  background-color: #FEF3C7;
-  color: #92400E;
-  border: 1px solid #FDE68A;
-}
-
-/* ============================================
-   セクションタイトル
-   ============================================ */
-.section-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: #1E293B;
-  margin-bottom: 20px;
-}
-
-.section-subtitle {
-  font-size: 14px;
-  color: #64748B;
-  margin-bottom: 16px;
-}
-
-/* ============================================
-   ユーティリティ
-   ============================================ */
-.text-right {
-  text-align: right;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.mt-4 {
-  margin-top: 16px;
-}
-
-.mb-4 {
-  margin-bottom: 16px;
-}
-
-.flex-between {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.hidden {
-  display: none;
-}
-
-/* ============================================
-   設定セクション
-   ============================================ */
-.settings-section {
-  margin-bottom: 32px;
-}
-
-.settings-section-title {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 16px;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #E2E8F0;
-  color: #1E293B;
-}
-
-.company-master-grid {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.company-master-grid th {
-  background-color: #F1F5F9;
-  padding: 10px 14px;
-  text-align: left;
-  font-size: 13px;
-  font-weight: 600;
-  color: #475569;
-  border-bottom: 1px solid #E2E8F0;
-}
-
-.company-master-grid td {
-  padding: 10px 14px;
-  border-bottom: 1px solid #E2E8F0;
-  font-size: 14px;
-}
-
-.company-master-grid tbody tr:hover {
-  background-color: #F8FAFC;
-}
-
-/* ============================================
-   トースト通知
-   ============================================ */
-#toast-container {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 2000;
-}
-
-.toast {
-  padding: 12px 20px;
-  border-radius: 8px;
-  margin-bottom: 8px;
-  font-size: 14px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  animation: fadeIn 0.3s ease;
-}
-
-.toast-success {
-  background-color: #ECFDF5;
-  color: #065F46;
-  border: 1px solid #A7F3D0;
-}
-
-.toast-error {
-  background-color: #FEF2F2;
-  color: #991B1B;
-  border: 1px solid #FECACA;
-}
-
-/* ============================================
-   レスポンシブ
+   レスポンシブデザイン (スマホ幅 768px 以下)
+   サイドバーを「ボトムナビゲーションバー」へ劇的変形！
    ============================================ */
 @media (max-width: 768px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .header-content {
+  .app-layout {
     flex-direction: column;
-    gap: 12px;
-    align-items: flex-start;
   }
 
-  .header-actions {
-    flex-wrap: wrap;
+  /* 左サイドバーを画面下部にピタッと水平配置するボトムナビに変形 */
+  .app-sidebar {
+    width: 100%;
+    height: 64px;
+    flex-direction: row;
+    position: fixed;
+    bottom: 0;
+    top: auto;
+    left: 0;
+    right: 0;
+    border-top: 1px solid var(--google-border-light);
+    border-right: none;
+    background-color: var(--google-surface);
+    padding: 0;
+    justify-content: space-around;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
+    z-index: 1000;
   }
 
-  .tab-nav {
-    padding: 0 12px;
+  /* スマホでは左上ロゴは非表示 */
+  .sidebar-brand {
+    display: none;
   }
 
-  .tab-btn {
-    padding: 12px 14px;
-    font-size: 13px;
+  .sidebar-nav {
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+    justify-content: space-around;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* スマホのメニューは縦並び(アイコンが上でテキストが下) */
+  .nav-item {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 6px 0;
+    width: auto;
+    height: 100%;
+    border-radius: 0;
+    font-size: 10px;
+    text-align: center;
+    flex: 1;
+  }
+
+  .nav-icon {
+    font-size: 20px !important;
+    padding: 4px 16px;
+    border-radius: 100px;
+    transition: var(--google-transition);
+  }
+
+  .nav-item:hover {
+    background-color: transparent;
+  }
+
+  /* スマホのホバーは無効、アクティブ時はアイコンの背景カプセルだけが明るく染まる設計 */
+  .nav-item.active {
+    background-color: transparent;
+    color: var(--google-primary);
+  }
+
+  .nav-item.active .nav-icon {
+    background-color: var(--google-active-pill);
+  }
+
+  /* メインエリアのスマホ余白補正 */
+  .app-container {
+    margin-left: 0;
+    margin-bottom: 64px; /* ボトムナビで隠れないように下部マージンを確保 */
+  }
+
+  .main-header {
+    display: none; /* スマホではミニマルヘッダーも隠して画面領域を広く */
   }
 
   .main-content {
     padding: 16px;
   }
 
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
   .card {
-    padding: 16px;
+    padding: 20px;
+    border-radius: 16px;
   }
 
   .notice-preview {
-    padding: 20px;
+    padding: 16px;
   }
 
   .flex-between {
@@ -933,10 +1070,15 @@ body {
     align-items: flex-start;
     gap: 12px;
   }
+
+  .month-selector {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 /* ============================================
-   印刷用 @media print
+   印刷用メディアクエリの保護設計
    ============================================ */
 @media print {
   @page {
@@ -944,8 +1086,9 @@ body {
     margin: 10mm;
   }
 
-  .app-header,
-  .tab-nav,
+  /* 不要なUIコンポーネントを完全に消し去り、請求明細書だけを出力 */
+  .app-sidebar,
+  .main-header,
   .btn,
   .btn-group,
   .month-selector,
@@ -953,8 +1096,13 @@ body {
     display: none !important;
   }
 
-  body {
-    background-color: #FFFFFF;
+  .app-container {
+    margin-left: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  body, .app-layout {
+    background-color: #FFFFFF !important;
   }
 
   .main-content {
@@ -963,8 +1111,8 @@ body {
   }
 
   .card {
-    box-shadow: none;
-    border: none;
+    box-shadow: none !important;
+    border: none !important;
     padding: 0;
     margin-bottom: 0;
   }
@@ -978,36 +1126,16 @@ body {
   }
 
   .notice-preview {
-    border: none;
-    width: 100%;
-    min-height: auto;
-    margin: 0;
-    padding: 0;
-    font-size: 11px;
+    border: none !important;
+    width: 100% !important;
+    min-height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 11px !important;
+    box-shadow: none !important;
   }
 
   #notice-preview-container {
     display: block !important;
   }
 }
-
-/* ============================================
-   ステータスバッジ
-   ============================================ */
-.status-badge {
-  display: inline-block;
-  padding: 4px 8px;
-  font-size: 12px;
-  font-weight: 600;
-  border-radius: 4px;
-  text-align: center;
-}
-.status-badge.unissued {
-  background-color: #F1F5F9;
-  color: #64748B;
-}
-.status-badge.issued {
-  background-color: #ECFDF5;
-  color: #059669;
-}
-
