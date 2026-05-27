@@ -35,7 +35,8 @@ body {
   color: var(--google-text-main);
   font-size: 14px;
   line-height: 1.6;
-  min-height: 100vh;
+  height: 100vh;       /* ウィンドウいっぱいに高さを固定 */
+  overflow: hidden;    /* ページ全体のスクロールバーを完全消去 */
   -webkit-font-smoothing: antialiased;
 }
 
@@ -44,7 +45,9 @@ body {
    ============================================ */
 .app-layout {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;       /* ウィンドウいっぱいに高さを固定 */
+  width: 100vw;
+  overflow: hidden;
   background-color: var(--google-bg);
 }
 
@@ -142,6 +145,8 @@ body {
   margin-left: 256px;
   display: flex;
   flex-direction: column;
+  height: 100vh;       /* 高さをウィンドウに固定 */
+  overflow: hidden;
   min-width: 0;
 }
 
@@ -159,6 +164,8 @@ body {
 .main-content {
   padding: 8px 24px 24px 24px;
   flex: 1;
+  overflow-y: auto;    /* メインエリア内のみのスクロールを有効化 */
+  height: calc(100vh - 56px); /* ヘッダー高さを引いて残りの高さにフィット */
 }
 
 /* ============================================
@@ -1140,7 +1147,8 @@ body {
   /* メインエリアのスマホ余白補正 */
   .app-container {
     margin-left: 0;
-    margin-bottom: 64px; /* ボトムナビで隠れないように下部マージンを確保 */
+    margin-bottom: 0;
+    height: calc(100vh - 64px); /* ボトムナビの高さ分を引いて100%フィットに */
   }
 
   .main-header {
@@ -1149,6 +1157,7 @@ body {
 
   .main-content {
     padding: 16px;
+    height: calc(100vh - 64px); /* スマホ側もボトムナビ高さを引いて100%フィットに */
   }
 
   .form-grid {
