@@ -1418,6 +1418,7 @@
     const content = document.getElementById('invoice-modal-content');
 
     let html = `<p style="margin-bottom:16px"><strong>${escapeHtml(company ? company.name : '不明')}</strong> ／ ${escapeHtml(siteName)}</p>`;
+    html += `<div class="modal-table-container">`;
     html += `<table class="data-table"><thead><tr>
       <th>請求日</th><th>区分</th><th>工事内容</th><th>金額</th><th>備考</th><th>操作</th>
     </tr></thead><tbody>`;
@@ -1441,7 +1442,7 @@
       </tr>`;
     });
 
-    html += '</tbody></table>';
+    html += '</tbody></table></div>';
     content.innerHTML = html;
 
     // 編集ボタン

@@ -778,6 +778,28 @@ body {
   box-shadow: 0 12px 36px rgba(0,0,0,0.1);
 }
 
+/* 請求詳細モーダル専用の広幅設定（横長テーブル用） */
+#invoice-modal .modal {
+  max-width: 850px;
+}
+
+/* モーダル内テーブルの横スクロールコンテナ */
+.modal-table-container {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--google-border-light);
+  border-radius: 16px;
+  margin-top: 12px;
+  background-color: var(--google-surface);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.01);
+}
+
+/* モーダル内テーブルの「操作」列のボタンがはみ出したり潰れたりするのを防ぐ幅担保 */
+.modal-table-container .data-table td:last-child {
+  width: 130px;
+  min-width: 130px;
+}
+
 .modal-title {
   font-size: 18px;
   font-weight: 500;
