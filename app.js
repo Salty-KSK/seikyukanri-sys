@@ -838,6 +838,7 @@
 
   function refreshRecentInvoices() {
     const container = document.getElementById('recent-invoices');
+    if (!container) return;
     const recent = [...appData.invoices].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 10);
 
     if (recent.length === 0) {

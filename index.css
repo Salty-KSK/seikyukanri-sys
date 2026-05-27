@@ -456,11 +456,13 @@ body {
   font-weight: 500;
 }
 
-/* クロス集計テーブル */
+/* クロス集計テーブル (Google Workspace / Material 3 プレミアム仕様) */
 .cross-table-container {
   overflow-x: auto;
-  border-radius: 16px;
+  border-radius: 20px;
   border: 1px solid var(--google-border-light);
+  background-color: var(--google-surface);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
 }
 
 .cross-table {
@@ -468,51 +470,94 @@ body {
   border-collapse: collapse;
 }
 
+/* 枠線を極限まで繊細に（Googleデザイン） */
 .cross-table th,
 .cross-table td {
   border: 1px solid var(--google-border-light);
-  padding: 10px 14px;
+  padding: 12px 18px;
   font-size: 13px;
-  white-space: nowrap; /* クロス集計テーブルはすべて絶対に改行しない */
+  white-space: nowrap;
 }
 
+/* ヘッダーの色を黒から、Google標準の上品な淡いブルーグレーへ！ */
 .cross-table thead th {
-  background-color: #1F1F1F;
-  color: var(--google-surface);
-  font-weight: 500;
+  background-color: #E9EEF6; /* Googleスプレッドシート風の非常に美しい淡いブルーグレー */
+  color: #444746;            /* Google標準のダークグレー文字 */
+  font-weight: 600;
   position: sticky;
   top: 0;
   z-index: 10;
   border-top: none;
+  font-size: 13px;
+  letter-spacing: 0.2px;
 }
 
+/* 行のストライプ（交互の縞模様）で横長の一覧性を劇的に向上 */
+.cross-table tbody tr:nth-child(even) td {
+  background-color: #FFFFFF;
+}
+
+.cross-table tbody tr:nth-child(odd) td {
+  background-color: #F8F9FA; /* 極薄のニュアンスグレー */
+}
+
+/* 左端固定の会社名列に『浮かび上がるようなシャドウ（フローティング効果）』を適用！ */
 .cross-table .company-name-cell {
   font-weight: 600;
-  background-color: #F8FAFC;
+  background-color: #FFFFFF !important;
   position: sticky;
   left: 0;
   z-index: 5;
   border-left: none;
-  white-space: nowrap; /* 業者名も改行させず綺麗に1行で固定 */
+  white-space: nowrap;
+  box-shadow: 4px 0 8px -3px rgba(0, 0, 0, 0.08); /* スクロール時に右側の表の上に選択肢がふわっと浮いて重なる美しい影 */
+}
+
+.cross-table tbody tr:nth-child(odd) .company-name-cell {
+  background-color: #F8F9FA !important;
 }
 
 .cross-table .industry-cell {
-  background-color: #F8FAFC;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--google-text-sub);
+  font-weight: 500;
+  background-color: inherit;
 }
 
 .cross-table .amount-cell {
   text-align: right;
   font-family: 'Inter', sans-serif;
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: var(--google-transition);
+  font-weight: 500;
 }
 
+/* 金額セルホバー時：カプセル背景のように美しいブルーに発光し、わずかに浮き上がる */
 .cross-table .amount-cell:not(:empty):hover {
-  background-color: var(--google-active-pill);
-  color: var(--google-primary);
+  background-color: var(--google-active-pill) !important;
+  color: var(--google-primary) !important;
   font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(11, 87, 208, 0.15);
+}
+
+/* 合計行（最下部）のGoogle Workspace風デザイン */
+.cross-table .total-row td {
+  font-weight: 700 !important;
+  background-color: #E8F0FE !important; /* 淡いライトブルー */
+  color: var(--google-primary) !important;
+  border-top: 2px solid var(--google-primary) !important;
+  border-bottom: none;
+}
+
+.cross-table .total-row .company-name-cell {
+  background-color: #E8F0FE !important;
+}
+
+/* 合計列（最右端）のGoogle Workspace風デザイン */
+.cross-table .total-col {
+  font-weight: 700;
+  background-color: #E9EEF6 !important; /* 縦合計の強調 */
+  color: #444746;
 }
 
 .cross-table .total-row td {
