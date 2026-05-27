@@ -158,11 +158,16 @@ body {
   justify-content: flex-end;
   align-items: center;
   height: 56px;
+  position: absolute;  /* 絶対配置で最上部に固定 */
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 100;
 }
 
 /* メインコンテンツエリア */
 .main-content {
-  padding: 8px 24px 24px 24px;
+  padding: 64px 24px 24px 24px; /* 上パディングを64px（ヘッダー56px + 心地よい余白8px）にし、潜り込みを完全防止 */
   flex: 1;
   overflow-y: auto;    /* メインエリア内のみのスクロールを有効化 */
   min-height: 0;       /* フレックスボックス内で正しく縮小可能にする */
