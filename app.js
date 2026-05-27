@@ -34,6 +34,123 @@
     return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
   }
 
+  // 日本の祝日（振替休日・国民の休日含む）を判定する軽量自己完結型ロジック
+  function getJapaneseHolidays(year) {
+    const holidays = [];
+    const add = (dateStr, name) => holidays.push({ date: dateStr, name });
+
+    add(`${year}-01-01`, "元日");
+    add(`${year}-01-${getNthMonday(year, 1, 2)}`, "成人の日");
+    add(`${year}-02-11`, "建国記念の日");
+    add(`${year}-02-23`, "天皇誕生日");
+
+    // 春分の日
+    const vernalEquinox = Math.floor(20.8431 + 0.242194 * (year - 1980) - Math.floor((year - 1980) / 4));
+    add(`${year}-03-${String(vernalEquinox).padStart(2, '0')}`, "春分の日");
+
+    add(`${year}-04-29`, "昭和の日");
+    add(`${year}-05-03`, "憲法記念日");
+    add(`${year}-05-04`, "みどりの日");
+    add(`${year}-05-05`, "こどもの日");
+    add(`${year}-07-${getNthMonday(year, 7, 3)}`, "海の日");
+    add(`${year}-08-11`, "山の日");
+
+    // 敬老の日
+    const respectForAgeDay = getNthMonday(year, 9, 3);
+    add(`${year}-09-${respectForAgeDay}`, "敬老の日");
+
+    // 秋分の日
+    const autumnalEquinox = Math.floor(23.2488 + 0.242194 * (year - 1980) - Math.floor((year - 1980) / 4));
+    add(`${year}-09-${String(autumnalEquinox).padStart(2, '0')}`, "秋分の日");
+
+    add(`${year}-10-${getNthMonday(year, 10, 2)}`, "スポーツの日");
+    add(`${year}-11-03`, "文化の日");
+    add(`${year}-11-23`, "勤労感謝の日");
+
+    const holidaySet = new Set(holidays.map(h => h.date));
+    const resultHolidays = [...holidays];
+
+    // 振替休日の判定 (祝日が日曜日の場合、その翌日以降の最初の「祝日でない平日」)
+    holidays.forEach(h => {
+      const d = new Date(h.date);
+      if (d.getDay() === 0) { // 日曜日
+        let substituteDate = new Date(d);
+        substituteDate.setDate(substituteDate.getDate() + 1);
+        let subStr = formatDateYMD(substituteDate);
+        while (holidaySet.has(subStr)) {
+          substituteDate.setDate(substituteDate.getDate() + 1);
+          subStr = formatDateYMD(substituteDate);
+        }
+        resultHolidays.push({ date: subStr, name: h.name + " 振替休日" });
+      }
+    });
+
+    // 国民の休日の判定 (祝日と祝日に挟まれた平日を休日にする。主に9月の敬老の日と秋分の日の間)
+    const updatedHolidaySet = new Set(resultHolidays.map(h => h.date));
+    const daysInSeptember = new Date(year, 9, 0).getDate();
+    for (let day = 2; day < daysInSeptember; day++) {
+      const currentStr = `${year}-09-${String(day).padStart(2, '0')}`;
+      const d = new Date(currentStr);
+      if (d.getDay() !== 0 && d.getDay() !== 6 && !updatedHolidaySet.has(currentStr)) {
+        const prevDate = new Date(d);
+        prevDate.setDate(prevDate.getDate() - 1);
+        const nextDate = new Date(d);
+        nextDate.setDate(nextDate.getDate() + 1);
+
+        if (updatedHolidaySet.has(formatDateYMD(prevDate)) && updatedHolidaySet.has(formatDateYMD(nextDate))) {
+          resultHolidays.push({ date: currentStr, name: "国民の休日" });
+        }
+      }
+    }
+
+    return resultHolidays;
+  }
+
+  // 補助関数: 第N月曜日の日付(日)を取得
+  function getNthMonday(year, month, n) {
+    const firstDay = new Date(year, month - 1, 1).getDay(); // 1日の曜日
+    let firstMonday = 1;
+    if (firstDay !== 1) {
+      firstMonday = firstDay === 0 ? 2 : 9 - firstDay;
+    }
+    return String(firstMonday + (n - 1) * 7).padStart(2, '0');
+  }
+
+  // 補助関数: YYYY-MM-DD フォーマット
+  function formatDateYMD(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  // 支払月(YYYY-MM)から「翌営業日の10日」を動的に算出する
+  function calculatePaymentDate(monthStr) {
+    const [year, month] = monthStr.split('-').map(Number);
+    // 基準日：支払月（当月）の10日
+    let paymentDate = new Date(year, month - 1, 10);
+
+    let holidays = getJapaneseHolidays(year);
+    if (month === 12) {
+      // 12月支払の場合、翌営業日が翌年1月に入る可能性があるので翌年の祝日も取得
+      holidays = holidays.concat(getJapaneseHolidays(year + 1));
+    }
+    const holidaySet = new Set(holidays.map(h => h.date));
+
+    while (true) {
+      const dayOfWeek = paymentDate.getDay();
+      const dateStr = formatDateYMD(paymentDate);
+
+      // 土曜日(6)、日曜日(0)、または祝日（振替休日含む）なら翌営業日へ繰り延べ
+      if (dayOfWeek === 0 || dayOfWeek === 6 || holidaySet.has(dateStr)) {
+        paymentDate.setDate(paymentDate.getDate() + 1);
+      } else {
+        break;
+      }
+    }
+    return paymentDate;
+  }
+
   function getPaymentMonthDefault(invoiceDateStr) {
     const d = new Date(invoiceDateStr);
     d.setMonth(d.getMonth() + 2);
@@ -1552,10 +1669,9 @@
     const taxRate = settings.taxRate / 100;
     const today = new Date();
 
-    // 支払日（月末）
-    const [py, pm] = month.split('-').map(Number);
-    const paymentDate = new Date(py, pm, 0); // 月末日
-    const paymentDateStr = formatDateSlash(paymentDate.toISOString().split('T')[0]);
+    // 支払日（翌営業日10日）
+    const paymentDate = calculatePaymentDate(month);
+    const paymentDateStr = formatDateSlash(formatDateYMD(paymentDate));
 
     // 明細計算
     let totalAmount = 0;
