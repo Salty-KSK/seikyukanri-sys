@@ -72,9 +72,10 @@
 
     // 振替休日の判定 (祝日が日曜日の場合、その翌日以降の最初の「祝日でない平日」)
     holidays.forEach(h => {
-      const d = new Date(h.date);
+      const [hy, hm, hd] = h.date.split('-').map(Number);
+      const d = new Date(hy, hm - 1, hd);
       if (d.getDay() === 0) { // 日曜日
-        let substituteDate = new Date(d);
+        let substituteDate = new Date(hy, hm - 1, hd);
         substituteDate.setDate(substituteDate.getDate() + 1);
         let subStr = formatDateYMD(substituteDate);
         while (holidaySet.has(subStr)) {
@@ -89,13 +90,11 @@
     const updatedHolidaySet = new Set(resultHolidays.map(h => h.date));
     const daysInSeptember = new Date(year, 9, 0).getDate();
     for (let day = 2; day < daysInSeptember; day++) {
-      const currentStr = `${year}-09-${String(day).padStart(2, '0')}`;
-      const d = new Date(currentStr);
+      const d = new Date(year, 8, day); // 9月 (0-indexedで8)
+      const currentStr = formatDateYMD(d);
       if (d.getDay() !== 0 && d.getDay() !== 6 && !updatedHolidaySet.has(currentStr)) {
-        const prevDate = new Date(d);
-        prevDate.setDate(prevDate.getDate() - 1);
-        const nextDate = new Date(d);
-        nextDate.setDate(nextDate.getDate() + 1);
+        const prevDate = new Date(year, 8, day - 1);
+        const nextDate = new Date(year, 8, day + 1);
 
         if (updatedHolidaySet.has(formatDateYMD(prevDate)) && updatedHolidaySet.has(formatDateYMD(nextDate))) {
           resultHolidays.push({ date: currentStr, name: "国民の休日" });
@@ -1671,7 +1670,7 @@
 
     // 支払日（翌営業日10日）
     const paymentDate = calculatePaymentDate(month);
-    const paymentDateStr = formatDateSlash(formatDateYMD(paymentDate));
+    const paymentDateStr = `${paymentDate.getFullYear()}/${String(paymentDate.getMonth() + 1).padStart(2, '0')}/${String(paymentDate.getDate()).padStart(2, '0')}`;
 
     // 明細計算
     let totalAmount = 0;
