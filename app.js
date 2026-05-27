@@ -1676,6 +1676,9 @@
     const taxRate = settings.taxRate / 100;
     const today = new Date();
 
+    // 支払月（年月）のパース
+    const [py, pm] = month.split('-').map(Number);
+
     // 支払日（翌営業日10日）
     const paymentDate = calculatePaymentDate(month);
     const paymentDateStr = `${paymentDate.getFullYear()}/${String(paymentDate.getMonth() + 1).padStart(2, '0')}/${String(paymentDate.getDate()).padStart(2, '0')}`;
