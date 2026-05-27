@@ -459,6 +459,8 @@ body {
 /* クロス集計テーブル (Google Workspace / Material 3 プレミアム仕様) */
 .cross-table-container {
   overflow-x: auto;
+  overflow-y: auto; /* 縦スクロールを有効にしてコンテナ内で完結 */
+  max-height: calc(100vh - 230px); /* 画面の高さからヘッダー分を引き、常に画面内にスクロールバーを表示 */
   border-radius: 20px;
   border: 1px solid var(--google-border-light);
   background-color: var(--google-surface);
