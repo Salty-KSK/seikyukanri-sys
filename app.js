@@ -1141,7 +1141,7 @@
 
     // ヘッダー行
     const thead = document.getElementById('cross-table-head');
-    let headerHtml = '<tr><th>業者名</th><th>業種</th>';
+    let headerHtml = '<tr><th class="company-name-cell">業者名</th><th>業種</th>';
     siteNames.forEach((site) => {
       headerHtml += `<th>${escapeHtml(getSiteShortName(site))}</th>`;
     });
@@ -1180,7 +1180,7 @@
     });
 
     // 合計行
-    bodyHtml += '<tr class="total-row"><td>合計</td><td></td>';
+    bodyHtml += '<tr class="total-row"><td class="company-name-cell">合計</td><td></td>';
     siteNames.forEach((site) => {
       bodyHtml += `<td class="amount-cell">${siteTotals[site] > 0 ? formatAmount(siteTotals[site]) : ''}</td>`;
     });

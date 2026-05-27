@@ -515,6 +515,12 @@ body {
   box-shadow: 4px 0 8px -3px rgba(0, 0, 0, 0.08); /* スクロール時に右側の表の上に選択肢がふわっと浮いて重なる美しい影 */
 }
 
+/* ヘッダーの左端「業者名」は縦・横スクロールが交差する左上のセルのため、z-indexを15に強化して最前面へ */
+.cross-table thead th.company-name-cell {
+  z-index: 15;
+  background-color: #E9EEF6 !important; /* ヘッダーの美しい淡いブルーグレーを維持 */
+}
+
 .cross-table tbody tr:nth-child(odd) .company-name-cell {
   background-color: #F8F9FA !important;
 }
