@@ -427,10 +427,24 @@
       [...new Set(appData.workTypes)].sort(sortByJapanese)
     );
 
-    // 会社名変更時：新規会社ならモーダル表示
+    // 会社名変更時：新規会社ならモーダル表示 ＆ 業種と取引区分のスマート連携
     companyInput.addEventListener('change', () => {
       const name = companyInput.value.trim();
-      if (name && !appData.companies.find((c) => c.name === name)) {
+      if (!name) return;
+      
+      const foundCompany = appData.companies.find((c) => c.name === name);
+      if (foundCompany) {
+        // マスターの業種から、取引区分を自動推測してセット
+        const ind = foundCompany.industry;
+        if (ind === '外注') {
+          categorySelect.value = 'outsource';
+        } else if (ind === '資材') {
+          categorySelect.value = 'material';
+        } else if (ind === '経費') {
+          categorySelect.value = 'expense';
+        }
+        handleCategoryChange(); // 区分切り替えを適用
+      } else {
         openCompanyModal(name);
       }
     });
@@ -473,7 +487,42 @@
     // 編集キャンセルボタン
     document.getElementById('btn-cancel-edit').addEventListener('click', cancelInvoiceEdit);
 
+    // 取引区分変更による工事内容入力の動的制御
+    const categorySelect = document.getElementById('input-category');
+    const groupWorkType = document.getElementById('group-work-type');
+    const workTypeInput = document.getElementById('input-work-type');
+
+    const handleCategoryChange = () => {
+      const category = categorySelect.value;
+      if (category === 'outsource') {
+        // 外注: 工事内容を通常表示・活性化
+        groupWorkType.classList.remove('hidden');
+        workTypeInput.readOnly = false;
+        workTypeInput.disabled = false;
+        workTypeInput.required = true;
+        if (workTypeInput.value === '資機材仕入') {
+          workTypeInput.value = '';
+        }
+      } else if (category === 'material') {
+        // 資機材: 工事内容に「資機材仕入」を自動セットし読み取り専用
+        groupWorkType.classList.remove('hidden');
+        workTypeInput.value = '資機材仕入';
+        workTypeInput.readOnly = true;
+        workTypeInput.disabled = false;
+        workTypeInput.required = true;
+      } else if (category === 'expense') {
+        // 経費: 工事内容を非表示化・必須解除
+        groupWorkType.classList.add('hidden');
+        workTypeInput.value = '';
+        workTypeInput.required = false;
+      }
+      checkDuplicateInvoice();
+    };
+
+    categorySelect.addEventListener('change', handleCategoryChange);
+
     // 重複チェック用入力監視イベント
+    categorySelect.addEventListener('change', () => checkDuplicateInvoice());
     companyInput.addEventListener('change', () => checkDuplicateInvoice());
     siteInput.addEventListener('change', () => checkDuplicateInvoice());
     siteInput.addEventListener('blur', () => checkDuplicateInvoice());
@@ -533,6 +582,7 @@
   }
 
   function submitInvoice() {
+    const category = document.getElementById('input-category').value;
     const companyName = document.getElementById('input-company').value.trim();
     const siteName = document.getElementById('input-site').value.trim();
     const siteShortName = document.getElementById('input-site-short').value.trim();
@@ -540,9 +590,11 @@
     const workType = document.getElementById('input-work-type').value.trim();
     const amount = parseAmount(document.getElementById('input-amount').value);
     const paymentMonth = document.getElementById('input-payment-month').value;
+    const notes = document.getElementById('input-notes').value.trim();
 
-    if (!companyName || !siteName || !siteShortName || !invoiceDate || !workType || !amount || !paymentMonth) {
-      showToast('すべての項目を入力してください', 'error');
+    const isOutsourceOrMaterial = category === 'outsource' || category === 'material';
+    if (!companyName || !siteName || !siteShortName || !invoiceDate || (isOutsourceOrMaterial && !workType) || !amount || !paymentMonth) {
+      showToast('すべての必須項目を入力してください', 'error');
       return;
     }
 
@@ -577,11 +629,11 @@
       appData.companies.push(company);
     }
 
-    // 現場名・工事内容の記録
+    // 現場名・工事内容の記録 (経費でなければ工事内容もマスターに記録)
     if (!appData.sites.includes(siteName)) {
       appData.sites.push(siteName);
     }
-    if (!appData.workTypes.includes(workType)) {
+    if (category !== 'expense' && workType && !appData.workTypes.includes(workType)) {
       appData.workTypes.push(workType);
     }
 
@@ -592,10 +644,12 @@
         invoice.companyId = company.id;
         invoice.siteName = siteName;
         invoice.siteShortName = siteShortName;
+        invoice.category = category;
         invoice.invoiceDate = invoiceDate;
-        invoice.workType = workType;
+        invoice.workType = category === 'expense' ? '' : workType;
         invoice.amount = amount;
         invoice.paymentMonth = paymentMonth;
+        invoice.notes = notes;
       }
 
       // 編集状態のクリア
@@ -615,10 +669,12 @@
         companyId: company.id,
         siteName,
         siteShortName,
+        category,
         invoiceDate,
-        workType,
+        workType: category === 'expense' ? '' : workType,
         amount,
         paymentMonth,
+        notes,
         createdAt: new Date().toISOString(),
       };
       appData.invoices.push(invoice);
@@ -631,11 +687,22 @@
   }
 
   function clearInvoiceForm() {
+    document.getElementById('input-category').value = 'outsource';
     document.getElementById('input-company').value = '';
     document.getElementById('input-site').value = '';
     document.getElementById('input-site-short').value = '';
-    document.getElementById('input-work-type').value = '';
+    
+    // 工事内容入力の表示状態を初期状態（活性化）にリセット
+    const groupWorkType = document.getElementById('group-work-type');
+    const workTypeInput = document.getElementById('input-work-type');
+    groupWorkType.classList.remove('hidden');
+    workTypeInput.value = '';
+    workTypeInput.readOnly = false;
+    workTypeInput.disabled = false;
+    workTypeInput.required = true;
+
     document.getElementById('input-amount').value = '';
+    document.getElementById('input-notes').value = '';
     const dateInput = document.getElementById('input-date');
     dateInput.value = new Date().toISOString().split('T')[0];
     document.getElementById('input-payment-month').value = getPaymentMonthDefault(dateInput.value);
@@ -656,18 +723,23 @@
 
     let html = `<table class="data-table">
       <thead><tr>
-        <th>会社名</th><th>現場名</th><th>工事内容</th><th>請求日</th><th>金額</th><th>支払月</th><th>操作</th>
+        <th>会社名</th><th>現場名</th><th>区分</th><th>工事内容</th><th>請求日</th><th>金額</th><th>支払月</th><th>備考</th><th>操作</th>
       </tr></thead><tbody>`;
 
     recent.forEach((inv) => {
       const company = appData.companies.find((c) => c.id === inv.companyId);
+      const categoryLabel = { outsource: '外注', material: '資機材', expense: '経費' }[inv.category || 'outsource'];
       html += `<tr>
         <td>${escapeHtml(company ? company.name : '不明')}</td>
         <td>${escapeHtml(inv.siteName)}</td>
-        <td>${escapeHtml(inv.workType)}</td>
+        <td>${escapeHtml(categoryLabel)}</td>
+        <td>${inv.category === 'expense' ? '<span style="color:#94A3B8">— (不要)</span>' : escapeHtml(inv.workType)}</td>
         <td>${formatDate(inv.invoiceDate)}</td>
         <td class="amount">${formatAmount(inv.amount)}</td>
         <td>${monthToDisplay(inv.paymentMonth)}</td>
+        <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(inv.notes || '')}">
+          ${escapeHtml(inv.notes || '—')}
+        </td>
         <td>
           <button class="btn btn-secondary btn-sm" data-edit-invoice="${inv.id}">編集</button>
           <button class="btn btn-danger btn-sm" data-delete-invoice="${inv.id}">削除</button>
@@ -719,6 +791,11 @@
     document.getElementById('input-work-type').value = inv.workType || '';
     document.getElementById('input-amount').value = formatAmount(inv.amount) || '';
     document.getElementById('input-payment-month').value = inv.paymentMonth || '';
+    document.getElementById('input-category').value = inv.category || 'outsource';
+    document.getElementById('input-notes').value = inv.notes || '';
+    
+    // 取引区分に応じた工事内容欄の表示同期イベントを手動発火
+    document.getElementById('input-category').dispatchEvent(new Event('change'));
 
     // UI更新
     document.getElementById('btn-submit-invoice').textContent = '更新';
@@ -1217,14 +1294,19 @@
 
     let html = `<p style="margin-bottom:16px"><strong>${escapeHtml(company ? company.name : '不明')}</strong> ／ ${escapeHtml(siteName)}</p>`;
     html += `<table class="data-table"><thead><tr>
-      <th>請求日</th><th>工事内容</th><th>金額</th><th>操作</th>
+      <th>請求日</th><th>区分</th><th>工事内容</th><th>金額</th><th>備考</th><th>操作</th>
     </tr></thead><tbody>`;
 
     invoices.forEach((inv) => {
+      const categoryLabel = { outsource: '外注', material: '資機材', expense: '経費' }[inv.category || 'outsource'];
       html += `<tr>
         <td>${formatDate(inv.invoiceDate)}</td>
-        <td>${escapeHtml(inv.workType)}</td>
+        <td>${escapeHtml(categoryLabel)}</td>
+        <td>${inv.category === 'expense' ? '<span style="color:#94A3B8">— (不要)</span>' : escapeHtml(inv.workType)}</td>
         <td class="amount">${formatAmount(inv.amount)}</td>
+        <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(inv.notes || '')}">
+          ${escapeHtml(inv.notes || '—')}
+        </td>
         <td>
           <div style="display: flex; gap: 6px;">
             <button class="btn btn-secondary btn-sm" data-edit-inv="${inv.id}">編集</button>
