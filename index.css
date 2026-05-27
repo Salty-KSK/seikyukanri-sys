@@ -414,12 +414,35 @@ body {
   color: var(--google-text-sub);
   border-top: 1px solid var(--google-border-light);
   border-bottom: 1px solid var(--google-border-light);
+  white-space: nowrap; /* ヘッダーも折り返さない */
 }
 
 .data-table td {
   padding: 14px 20px;
   border-bottom: 1px solid var(--google-border-light);
   font-size: 14px;
+  white-space: nowrap; /* テキストの折り返しを禁止 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 長くなりやすい「会社名」「現場名」「工事内容」「備考」に適切な最大幅を設定して三点リーダー化 */
+#recent-invoices .data-table td:nth-child(1), /* 会社名 */
+#recent-invoices .data-table td:nth-child(2)  /* 現場名 */ {
+  max-width: 180px;
+}
+
+#recent-invoices .data-table td:nth-child(4)  /* 工事内容 */ {
+  max-width: 200px;
+}
+
+#recent-invoices .data-table td:nth-child(8)  /* 備考 */ {
+  max-width: 150px;
+}
+
+/* 支払い対象業者一覧テーブルの会社名 */
+#notice-company-list td:nth-child(2) {
+  max-width: 240px;
 }
 
 .data-table tbody tr:hover {
@@ -450,6 +473,7 @@ body {
   border: 1px solid var(--google-border-light);
   padding: 10px 14px;
   font-size: 13px;
+  white-space: nowrap; /* クロス集計テーブルはすべて絶対に改行しない */
 }
 
 .cross-table thead th {
@@ -469,6 +493,7 @@ body {
   left: 0;
   z-index: 5;
   border-left: none;
+  white-space: nowrap; /* 業者名も改行させず綺麗に1行で固定 */
 }
 
 .cross-table .industry-cell {
