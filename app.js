@@ -834,8 +834,12 @@
 
       // === 予算管理システム連携: linked_invoices に保存 ===
       const linkedProjectId = document.getElementById('input-linked-project').value;
-      const orderNumber = document.getElementById('input-order-number').value.trim();
-      if (linkedProjectId && orderNumber) {
+      const orderNumberInput = document.getElementById('input-order-number').value.trim();
+      if (linkedProjectId) {
+        // 発注番号が未入力の場合は自動採番 (INV-YYYYMMDD-HHmmss)
+        const now = new Date();
+        const autoNum = `INV-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}`;
+        const orderNumber = orderNumberInput || autoNum;
         const categoryMap = { outsource: 'construction', material: 'materials', expense: 'temporary' };
         try {
           await supabaseClient.from('linked_invoices').insert({
@@ -848,7 +852,7 @@
             payment_month: paymentMonth,
             invoice_date: invoiceDate
           });
-          console.log('予算管理連携: linked_invoices に保存成功');
+          console.log('予算管理連携: linked_invoices に保存成功 (番号:', orderNumber, ')');
         } catch (e) {
           console.warn('予算管理連携エラー:', e);
         }
