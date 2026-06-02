@@ -631,23 +631,46 @@
 
     // 発注番号から注文書データを自動入力
     const orderNumInput = document.getElementById('input-order-number');
-    orderNumInput.addEventListener('blur', async () => {
+    const lookupOrder = async () => {
       const orderNum = orderNumInput.value.trim();
       if (!orderNum) return;
 
+      console.log('発注番号を検索中:', orderNum);
+
       try {
-        const { data: orders, error } = await supabaseClient
+        // まず完全一致で検索
+        let { data: orders, error } = await supabaseClient
           .from('linked_orders')
           .select('*')
           .eq('order_number', orderNum)
           .limit(1);
 
-        if (error || !orders || orders.length === 0) {
+        // 完全一致で見つからなければ部分一致で検索
+        if ((!orders || orders.length === 0) && !error) {
+          console.log('完全一致なし、部分一致で再検索...');
+          const result = await supabaseClient
+            .from('linked_orders')
+            .select('*')
+            .ilike('order_number', `%${orderNum}%`)
+            .limit(1);
+          orders = result.data;
+          error = result.error;
+        }
+
+        if (error) {
+          console.error('Supabase検索エラー:', error);
+          showToast('注文書データの検索でエラーが発生しました', 'error');
+          return;
+        }
+
+        if (!orders || orders.length === 0) {
           console.log('注文書データが見つかりません:', orderNum);
+          showToast(`発注番号「${orderNum}」に一致する注文書が見つかりません`, 'error');
           return;
         }
 
         const order = orders[0];
+        console.log('注文書データ取得成功:', order);
 
         // 会社名の自動入力
         if (order.company_name) {
@@ -669,8 +692,9 @@
         // 取引区分の自動入力
         if (order.category) {
           const catMap = { construction: 'outsource', materials: 'material', temporary: 'expense' };
-          categorySelect.value = catMap[order.category] || 'outsource';
-          categorySelect.dispatchEvent(new Event('change'));
+          const catSelect = document.getElementById('input-category');
+          catSelect.value = catMap[order.category] || 'outsource';
+          catSelect.dispatchEvent(new Event('change'));
         }
 
         // 対象工事の自動選択
@@ -696,9 +720,12 @@
 
         showToast(`注文書 ${orderNum} のデータを自動入力しました`);
       } catch (e) {
-        console.warn('注文書データの検索に失敗:', e);
+        console.error('注文書データの検索に失敗:', e);
+        showToast('注文書データの検索に失敗しました', 'error');
       }
-    });
+    };
+    orderNumInput.addEventListener('blur', lookupOrder);
+    orderNumInput.addEventListener('change', lookupOrder);
 
     // クリアボタン
     document.getElementById('btn-clear-form').addEventListener('click', clearInvoiceForm);
