@@ -1230,9 +1230,7 @@
     document.getElementById('btn-close-company-modal').addEventListener('click', closeCompanyModal);
     document.getElementById('btn-cancel-company').addEventListener('click', closeCompanyModal);
 
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) closeCompanyModal();
-    });
+    // モーダル外クリックでは閉じない（登録 or キャンセルのみ）
 
     // 会社名が変更されたら、新規登録時に限りフリガナを自動提案する
     nameInput.addEventListener('input', () => {
