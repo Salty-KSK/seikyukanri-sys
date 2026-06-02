@@ -635,6 +635,49 @@
     let cachedOrders = []; // 選択中の工事の注文書一覧キャッシュ
     let isApplyingOrder = false; // 自動入力中フラグ（イベント循環防止）
 
+    // 発注金額・支払実績の参照情報を表示する関数
+    function showOrderRefInfo(order) {
+      const refEl = document.getElementById('order-ref-info');
+      if (!refEl || !order) return;
+
+      const orderAmount = order.amount || 0;
+
+      // 同一注文書番号の支払実績を既存請求データから集計
+      const orderNum = order.order_number;
+      const paidInvoices = appData.invoices.filter(inv =>
+        inv.orderNumber === orderNum && inv.id !== editingInvoiceId
+      );
+      const paidTotal = paidInvoices.reduce((sum, inv) => sum + (inv.amount || 0), 0);
+      const paidPercent = orderAmount > 0 ? Math.round((paidTotal / orderAmount) * 100) : 0;
+
+      // 表示更新
+      document.getElementById('order-ref-amount').textContent = `¥${formatAmount(orderAmount)}`;
+      document.getElementById('order-ref-paid').textContent = `¥${formatAmount(paidTotal)}`;
+
+      // パーセンテージの色分け
+      const percentEl = document.getElementById('order-ref-percent');
+      percentEl.textContent = `（${paidPercent}%）`;
+      if (paidPercent >= 100) {
+        percentEl.style.color = '#D93025'; // 赤: 100%以上（超過注意）
+      } else if (paidPercent >= 80) {
+        percentEl.style.color = '#E37400'; // オレンジ: 80%以上
+      } else {
+        percentEl.style.color = '#1E8E3E'; // 緑: 正常
+      }
+
+      refEl.classList.remove('hidden');
+      refEl.style.display = '';
+    }
+
+    // 発注金額・支払実績の参照情報を非表示にする関数
+    function hideOrderRefInfo() {
+      const refEl = document.getElementById('order-ref-info');
+      if (refEl) {
+        refEl.classList.add('hidden');
+        refEl.style.display = 'none';
+      }
+    }
+
     // 注文書データをフォームに自動入力する共通関数
     function applyOrderData(order) {
       if (!order) return;
@@ -658,6 +701,9 @@
       if (order.budget_item_name) {
         document.getElementById('input-work-type').value = order.budget_item_name;
       }
+
+      // 発注金額・支払実績の参照表示
+      showOrderRefInfo(order);
 
       isApplyingOrder = false;
       showToast(`注文書 ${order.order_number} のデータを自動入力しました`);
@@ -1054,6 +1100,10 @@
     // 重複警告の非表示化
     const alertEl = document.getElementById('invoice-duplicate-alert');
     if (alertEl) alertEl.classList.add('hidden');
+
+    // 発注金額・支払実績の非表示化
+    const refEl = document.getElementById('order-ref-info');
+    if (refEl) { refEl.classList.add('hidden'); refEl.style.display = 'none'; }
   }
 
   function refreshRecentInvoices() {

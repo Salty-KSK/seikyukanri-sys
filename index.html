@@ -109,6 +109,19 @@
               <div class="form-group">
                 <label class="form-label" for="input-amount">金額（税込） <span style="color:#DC2626">*</span></label>
                 <input type="text" id="input-amount" class="form-input" placeholder="例: 1,000,000" required>
+                <div id="order-ref-info" class="hidden" style="display:none; margin-top: 8px; padding: 10px 14px; background: var(--hover-bg, #F1F3F4); border-radius: 8px; font-size: 13px; line-height: 1.6; border-left: 3px solid var(--google-primary, #1A73E8);">
+                  <div style="display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: center;">
+                    <span style="color: #5F6368; white-space: nowrap;">
+                      <span class="material-symbols-outlined" style="font-size: 15px; vertical-align: -2px; margin-right: 2px;">receipt_long</span>
+                      発注金額：<strong id="order-ref-amount" style="color: #1A73E8; font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums;">¥0</strong>
+                    </span>
+                    <span style="color: #5F6368; white-space: nowrap;">
+                      <span class="material-symbols-outlined" style="font-size: 15px; vertical-align: -2px; margin-right: 2px;">payments</span>
+                      支払実績：<strong id="order-ref-paid" style="font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums;">¥0</strong>
+                      <span id="order-ref-percent" style="font-weight: 600; margin-left: 2px;">（0%）</span>
+                    </span>
+                  </div>
+                </div>
               </div>
               <div class="form-group">
                 <label class="form-label" for="input-payment-month">支払月 <span style="color:#DC2626">*</span></label>
