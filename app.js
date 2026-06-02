@@ -2228,18 +2228,42 @@
 
     // 会社マスター一覧
     refreshCompanyMasterList();
+
+    // 会社マスター検索
+    const searchInput = document.getElementById('company-master-search');
+    if (searchInput) {
+      searchInput.addEventListener('input', () => refreshCompanyMasterList());
+    }
   }
 
   function refreshCompanyMasterList() {
     const container = document.getElementById('company-master-list');
-    const companies = [...appData.companies].sort(sortByCompanyKana);
+    const searchInput = document.getElementById('company-master-search');
+    const query = (searchInput ? searchInput.value.trim() : '').toLowerCase();
+    const allCompanies = [...appData.companies].sort(sortByCompanyKana);
 
-    if (companies.length === 0) {
+    // 検索フィルタ
+    const companies = query
+      ? allCompanies.filter(c => {
+          const fields = [c.name, c.kana, c.industry, c.contactPerson, c.tel, c.bankName].filter(Boolean);
+          return fields.some(f => f.toLowerCase().includes(query));
+        })
+      : allCompanies;
+
+    if (allCompanies.length === 0) {
       container.innerHTML = '<p style="color:#64748B;text-align:center;padding:20px;">登録された会社はありません</p>';
       return;
     }
 
-    let html = `<table class="data-table">
+    if (companies.length === 0) {
+      container.innerHTML = '<p style="color:#64748B;text-align:center;padding:20px;">検索結果がありません</p>';
+      return;
+    }
+
+    const countLabel = query ? `${companies.length} / ${allCompanies.length} 件` : `${allCompanies.length} 件`;
+
+    let html = `<div style="text-align: right; font-size: 12px; color: #9AA0A6; margin-bottom: 4px;">${countLabel}</div>
+    <table class="data-table">
       <thead><tr>
         <th>会社名</th><th>フリガナ</th><th>業種</th><th>担当者</th><th>電話番号</th><th>銀行</th><th>操作</th>
       </tr></thead><tbody>`;
