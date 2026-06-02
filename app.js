@@ -629,6 +629,77 @@
     siteInput.addEventListener('change', suggestSiteShortName);
     siteInput.addEventListener('blur', suggestSiteShortName);
 
+    // 発注番号から注文書データを自動入力
+    const orderNumInput = document.getElementById('input-order-number');
+    orderNumInput.addEventListener('blur', async () => {
+      const orderNum = orderNumInput.value.trim();
+      if (!orderNum) return;
+
+      try {
+        const { data: orders, error } = await supabaseClient
+          .from('linked_orders')
+          .select('*')
+          .eq('order_number', orderNum)
+          .limit(1);
+
+        if (error || !orders || orders.length === 0) {
+          console.log('注文書データが見つかりません:', orderNum);
+          return;
+        }
+
+        const order = orders[0];
+
+        // 会社名の自動入力
+        if (order.company_name) {
+          companyInput.value = order.company_name;
+          companyInput.dispatchEvent(new Event('change'));
+        }
+
+        // 工事内容の自動入力
+        if (order.budget_item_name) {
+          document.getElementById('input-work-type').value = order.budget_item_name;
+        }
+
+        // 金額の自動入力 (注文書は税抜で保存 → 税込に変換)
+        if (order.amount) {
+          const taxIncluded = Math.floor(order.amount * 1.1);
+          document.getElementById('input-amount').value = formatAmount(taxIncluded);
+        }
+
+        // 取引区分の自動入力
+        if (order.category) {
+          const catMap = { construction: 'outsource', materials: 'material', temporary: 'expense' };
+          categorySelect.value = catMap[order.category] || 'outsource';
+          categorySelect.dispatchEvent(new Event('change'));
+        }
+
+        // 対象工事の自動選択
+        if (order.project_id) {
+          document.getElementById('input-linked-project').value = order.project_id;
+
+          // プロジェクト名から現場名を自動入力
+          try {
+            const { data: project } = await supabaseClient
+              .from('projects')
+              .select('site_name')
+              .eq('id', order.project_id)
+              .single();
+
+            if (project && project.site_name) {
+              siteInput.value = project.site_name;
+              siteInput.dispatchEvent(new Event('change'));
+            }
+          } catch (e) {
+            console.warn('プロジェクト情報の取得に失敗:', e);
+          }
+        }
+
+        showToast(`注文書 ${orderNum} のデータを自動入力しました`);
+      } catch (e) {
+        console.warn('注文書データの検索に失敗:', e);
+      }
+    });
+
     // クリアボタン
     document.getElementById('btn-clear-form').addEventListener('click', clearInvoiceForm);
 
@@ -729,7 +800,7 @@
     }
   }
 
-  function submitInvoice() {
+  async function submitInvoice() {
     const category = document.getElementById('input-category').value;
     const companyName = document.getElementById('input-company').value.trim();
     const siteName = document.getElementById('input-site').value.trim();
@@ -798,6 +869,8 @@
         invoice.amount = amount;
         invoice.paymentMonth = paymentMonth;
         invoice.notes = notes;
+        invoice.orderNumber = document.getElementById('input-order-number').value.trim();
+        invoice.linkedProjectId = document.getElementById('input-linked-project').value;
       }
 
       // 編集状態のクリア
@@ -823,6 +896,8 @@
         amount,
         paymentMonth,
         notes,
+        orderNumber: document.getElementById('input-order-number').value.trim(),
+        linkedProjectId: document.getElementById('input-linked-project').value,
         createdAt: new Date().toISOString(),
       };
       appData.invoices.push(invoice);
@@ -877,6 +952,8 @@
 
     document.getElementById('input-amount').value = '';
     document.getElementById('input-notes').value = '';
+    document.getElementById('input-order-number').value = '';
+    document.getElementById('input-linked-project').value = '';
     const dateInput = document.getElementById('input-date');
     dateInput.value = new Date().toISOString().split('T')[0];
     document.getElementById('input-payment-month').value = getPaymentMonthDefault(dateInput.value);
@@ -968,6 +1045,8 @@
     document.getElementById('input-payment-month').value = inv.paymentMonth || '';
     document.getElementById('input-category').value = inv.category || 'outsource';
     document.getElementById('input-notes').value = inv.notes || '';
+    document.getElementById('input-order-number').value = inv.orderNumber || '';
+    document.getElementById('input-linked-project').value = inv.linkedProjectId || '';
     
     // 取引区分に応じた工事内容欄の表示同期イベントを手動発火
     document.getElementById('input-category').dispatchEvent(new Event('change'));
