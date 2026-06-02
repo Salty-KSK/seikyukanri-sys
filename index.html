@@ -118,16 +118,24 @@
                 <label class="form-label" for="input-notes">備考</label>
                 <input type="text" id="input-notes" class="form-input" placeholder="特記事項やメモなどがあれば入力">
               </div>
-              <!-- 予算管理連携フィールド -->
-              <div class="form-group">
-                <label class="form-label" for="input-order-number">発注番号（予算管理連携）</label>
-                <input type="text" id="input-order-number" class="form-input" placeholder="例: 35T-001">
+              <!-- 注文書連携 -->
+              <div class="form-group full-width" style="margin-top: 4px; margin-bottom: -4px; padding-top: 12px; border-top: 1px dashed var(--border-color);">
+                <label class="form-label" style="display: flex; align-items: center; gap: 6px; color: var(--google-primary); font-weight: 600; font-size: 13px; letter-spacing: 0.5px; margin-bottom: 0;">
+                  <span class="material-symbols-outlined" style="font-size: 18px;">link</span>注文書連携
+                </label>
               </div>
               <div class="form-group">
-                <label class="form-label" for="input-linked-project">対象工事（予算管理連携）</label>
+                <label class="form-label" for="input-linked-project">対象工事</label>
                 <select id="input-linked-project" class="form-select">
                   <option value="">-- 選択してください --</option>
                 </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="input-order-number">注文書番号</label>
+                <div class="autocomplete-wrapper">
+                  <input type="text" id="input-order-number" class="form-input" placeholder="対象工事を選択すると候補が表示されます" autocomplete="off">
+                  <div id="order-suggestions" class="autocomplete-list hidden"></div>
+                </div>
               </div>
             </div>
             <div id="invoice-duplicate-alert" class="alert alert-warning hidden mt-4" style="margin-bottom: 0; width: 100%;"></div>

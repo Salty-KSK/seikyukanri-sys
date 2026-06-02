@@ -629,25 +629,120 @@
     siteInput.addEventListener('change', suggestSiteShortName);
     siteInput.addEventListener('blur', suggestSiteShortName);
 
-    // 発注番号から注文書データを自動入力
+    // === 注文書連携: 対象工事 ⇔ 注文書番号の双方向連動 ===
     const orderNumInput = document.getElementById('input-order-number');
-    const lookupOrder = async () => {
-      const orderNum = orderNumInput.value.trim();
-      if (!orderNum) return;
+    const linkedProjectSelect = document.getElementById('input-linked-project');
+    let cachedOrders = []; // 選択中の工事の注文書一覧キャッシュ
+    let isApplyingOrder = false; // 自動入力中フラグ（イベント循環防止）
 
-      console.log('発注番号を検索中:', orderNum);
+    // 注文書データをフォームに自動入力する共通関数
+    function applyOrderData(order) {
+      if (!order) return;
+      isApplyingOrder = true;
+
+      // 取引区分
+      if (order.category) {
+        const catMap = { construction: 'outsource', materials: 'material', temporary: 'expense' };
+        const catSelect = document.getElementById('input-category');
+        catSelect.value = catMap[order.category] || 'outsource';
+        catSelect.dispatchEvent(new Event('change'));
+      }
+
+      // 会社名
+      if (order.company_name) {
+        companyInput.value = order.company_name;
+        companyInput.dispatchEvent(new Event('change'));
+      }
+
+      // 工事内容
+      if (order.budget_item_name) {
+        document.getElementById('input-work-type').value = order.budget_item_name;
+      }
+
+      isApplyingOrder = false;
+      showToast(`注文書 ${order.order_number} のデータを自動入力しました`);
+    }
+
+    // (A) 対象工事選択 → 注文書番号候補を取得 + 現場名自動入力
+    linkedProjectSelect.addEventListener('change', async () => {
+      if (isApplyingOrder) return;
+      const projectId = linkedProjectSelect.value;
+      orderNumInput.value = '';
+      cachedOrders = [];
+
+      if (!projectId) return;
 
       try {
-        // まず完全一致で検索
+        // 注文書一覧を取得
+        const { data: orders } = await supabaseClient
+          .from('linked_orders')
+          .select('*')
+          .eq('project_id', projectId)
+          .order('created_at', { ascending: false });
+
+        cachedOrders = orders || [];
+        console.log(`対象工事の注文書: ${cachedOrders.length}件`, cachedOrders);
+
+        // 現場名を対象工事名から自動入力
+        const selectedOption = linkedProjectSelect.options[linkedProjectSelect.selectedIndex];
+        if (selectedOption && selectedOption.textContent) {
+          siteInput.value = selectedOption.textContent;
+          siteInput.dispatchEvent(new Event('change')); // 省略名も連動
+        }
+
+        if (cachedOrders.length > 0) {
+          showToast(`${cachedOrders.length}件の注文書が見つかりました。注文書番号をクリックして選択してください`);
+        }
+      } catch (e) {
+        console.warn('注文書一覧の取得に失敗:', e);
+      }
+    });
+
+    // (B) 注文書番号のオートコンプリート設定（工事の注文書候補を表示）
+    setupAutocomplete('input-order-number', 'order-suggestions', () =>
+      cachedOrders.map(o => {
+        // 「番号（会社名／工事内容）」形式で表示
+        const parts = [o.company_name, o.budget_item_name].filter(Boolean).join('／');
+        return parts ? `${o.order_number}（${parts}）` : o.order_number;
+      })
+    );
+
+    // (C) 注文書番号が選択/変更 → 注文データを自動入力
+    orderNumInput.addEventListener('change', () => {
+      const inputVal = orderNumInput.value.trim();
+      if (!inputVal || isApplyingOrder) return;
+
+      // オートコンプリートから選択された場合「番号（...）」から番号のみ抽出
+      const match = inputVal.match(/^([^（]+)/);
+      const orderNum = match ? match[1].trim() : inputVal;
+      orderNumInput.value = orderNum; // 表示を番号のみにクリーン化
+
+      // キャッシュから一致する注文を検索
+      const order = cachedOrders.find(o => o.order_number === orderNum);
+      if (order) {
+        applyOrderData(order);
+      }
+    });
+
+    // (D) 注文書番号を手動入力 → Supabase検索 → 対象工事も自動選択
+    orderNumInput.addEventListener('blur', async () => {
+      const orderNum = orderNumInput.value.trim();
+      if (!orderNum || isApplyingOrder) return;
+
+      // キャッシュに既にあれば処理済み（changeイベントで対応済み）
+      if (cachedOrders.find(o => o.order_number === orderNum)) return;
+
+      console.log('手動入力の注文書番号をSupabaseで検索:', orderNum);
+
+      try {
+        // 完全一致 → 部分一致のフォールバック検索
         let { data: orders, error } = await supabaseClient
           .from('linked_orders')
           .select('*')
           .eq('order_number', orderNum)
           .limit(1);
 
-        // 完全一致で見つからなければ部分一致で検索
         if ((!orders || orders.length === 0) && !error) {
-          console.log('完全一致なし、部分一致で再検索...');
           const result = await supabaseClient
             .from('linked_orders')
             .select('*')
@@ -657,75 +752,46 @@
           error = result.error;
         }
 
-        if (error) {
-          console.error('Supabase検索エラー:', error);
-          showToast('注文書データの検索でエラーが発生しました', 'error');
-          return;
-        }
-
-        if (!orders || orders.length === 0) {
-          console.log('注文書データが見つかりません:', orderNum);
-          showToast(`発注番号「${orderNum}」に一致する注文書が見つかりません`, 'error');
+        if (error || !orders || orders.length === 0) {
+          console.log('注文書が見つかりません:', orderNum);
           return;
         }
 
         const order = orders[0];
-        console.log('注文書データ取得成功:', order);
 
-        // 会社名の自動入力
-        if (order.company_name) {
-          companyInput.value = order.company_name;
-          companyInput.dispatchEvent(new Event('change'));
-        }
-
-        // 工事内容の自動入力
-        if (order.budget_item_name) {
-          document.getElementById('input-work-type').value = order.budget_item_name;
-        }
-
-        // 金額の自動入力 (注文書は税抜で保存 → 税込に変換)
-        if (order.amount) {
-          const taxIncluded = Math.floor(order.amount * 1.1);
-          document.getElementById('input-amount').value = formatAmount(taxIncluded);
-        }
-
-        // 取引区分の自動入力
-        if (order.category) {
-          const catMap = { construction: 'outsource', materials: 'material', temporary: 'expense' };
-          const catSelect = document.getElementById('input-category');
-          catSelect.value = catMap[order.category] || 'outsource';
-          catSelect.dispatchEvent(new Event('change'));
-        }
-
-        // 対象工事の自動選択
+        // 対象工事を自動選択
         if (order.project_id) {
-          document.getElementById('input-linked-project').value = order.project_id;
+          linkedProjectSelect.value = order.project_id;
 
-          // プロジェクト名から現場名を自動入力
+          // 現場名を自動入力
+          const selectedOption = linkedProjectSelect.options[linkedProjectSelect.selectedIndex];
+          if (selectedOption && selectedOption.textContent && selectedOption.value) {
+            siteInput.value = selectedOption.textContent;
+            siteInput.dispatchEvent(new Event('change'));
+          }
+
+          // その工事の注文書一覧もキャッシュ更新
           try {
-            const { data: project } = await supabaseClient
-              .from('projects')
-              .select('site_name')
-              .eq('id', order.project_id)
-              .single();
-
-            if (project && project.site_name) {
-              siteInput.value = project.site_name;
-              siteInput.dispatchEvent(new Event('change'));
-            }
+            const { data: relatedOrders } = await supabaseClient
+              .from('linked_orders')
+              .select('*')
+              .eq('project_id', order.project_id)
+              .order('created_at', { ascending: false });
+            cachedOrders = relatedOrders || [];
           } catch (e) {
-            console.warn('プロジェクト情報の取得に失敗:', e);
+            console.warn('関連注文書の取得に失敗:', e);
           }
         }
 
-        showToast(`注文書 ${orderNum} のデータを自動入力しました`);
+        // 注文書番号を正式な値にセット
+        orderNumInput.value = order.order_number;
+
+        // 内容を自動入力
+        applyOrderData(order);
       } catch (e) {
-        console.error('注文書データの検索に失敗:', e);
-        showToast('注文書データの検索に失敗しました', 'error');
+        console.error('注文書の検索に失敗:', e);
       }
-    };
-    orderNumInput.addEventListener('blur', lookupOrder);
-    orderNumInput.addEventListener('change', lookupOrder);
+    });
 
     // クリアボタン
     document.getElementById('btn-clear-form').addEventListener('click', clearInvoiceForm);
