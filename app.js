@@ -5,6 +5,30 @@
 (function () {
   'use strict';
 
+  // === 予算管理システム連携 (Supabase) ===
+  const SUPABASE_URL = 'https://wwymcmsyixfgmteyashe.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3eW1jbXN5aXhmZ210ZXlhc2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzNDY0MzEsImV4cCI6MjA5NTkyMjQzMX0.0nb2-kyRF-b9bZE-PlxWQ5AGA86BkFkB-uFyrXBxYRc';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // 予算管理プロジェクト一覧を取得してドロップダウンにセット
+  (async function loadLinkedProjects() {
+    try {
+      const linkedProjectSelect = document.getElementById('input-linked-project');
+      if (!linkedProjectSelect) return;
+      const { data: projects } = await supabaseClient.from('projects').select('id, site_name').order('created_at', { ascending: false });
+      if (projects && projects.length > 0) {
+        projects.forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p.id;
+          opt.textContent = p.site_name;
+          linkedProjectSelect.appendChild(opt);
+        });
+      }
+    } catch (e) {
+      console.warn('予算管理プロジェクトの取得に失敗:', e);
+    }
+  })();
+
   // ----------------------------------------------------------
   // 実行時エラーの検知・画面通知（トラブルシューティング用）
   // ----------------------------------------------------------
@@ -807,6 +831,28 @@
       clearInvoiceForm();
       refreshRecentInvoices();
       showToast(`${companyName} の請求を登録しました`);
+
+      // === 予算管理システム連携: linked_invoices に保存 ===
+      const linkedProjectId = document.getElementById('input-linked-project').value;
+      const orderNumber = document.getElementById('input-order-number').value.trim();
+      if (linkedProjectId && orderNumber) {
+        const categoryMap = { outsource: 'construction', material: 'materials', expense: 'temporary' };
+        try {
+          await supabaseClient.from('linked_invoices').insert({
+            project_id: linkedProjectId,
+            order_number: orderNumber,
+            category: categoryMap[category] || 'construction',
+            budget_item_name: workType || siteName,
+            company_name: companyName,
+            amount: amount,
+            payment_month: paymentMonth,
+            invoice_date: invoiceDate
+          });
+          console.log('予算管理連携: linked_invoices に保存成功');
+        } catch (e) {
+          console.warn('予算管理連携エラー:', e);
+        }
+      }
     }
   }
 
