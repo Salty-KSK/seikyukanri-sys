@@ -69,6 +69,30 @@
           <h2 class="section-title">請求入力</h2>
           <form id="invoice-form">
             <div class="form-grid">
+              <!-- 注文書連携（一番上） -->
+              <div class="form-group full-width" style="margin-bottom: -4px;">
+                <label class="form-label" style="display: flex; align-items: center; gap: 12px; color: var(--google-primary); font-weight: 600; font-size: 13px; letter-spacing: 0.5px; margin-bottom: 0;">
+                  注文書連携
+                  <label style="display: inline-flex; align-items: center; gap: 4px; font-weight: 500; font-size: 12.5px; color: #5F6368; cursor: pointer; margin-left: auto;">
+                    <input type="checkbox" id="input-no-order" style="cursor: pointer; accent-color: #5F6368;">
+                    注文書なし
+                  </label>
+                </label>
+              </div>
+              <div class="form-group" id="group-linked-project">
+                <label class="form-label" for="input-linked-project">対象工事</label>
+                <select id="input-linked-project" class="form-select">
+                  <option value="">-- 選択してください --</option>
+                </select>
+              </div>
+              <div class="form-group" id="group-order-number">
+                <label class="form-label" for="input-order-number">注文書番号</label>
+                <div class="autocomplete-wrapper">
+                  <input type="text" id="input-order-number" class="form-input" placeholder="対象工事を選択すると候補が表示されます" autocomplete="off">
+                  <div id="order-suggestions" class="autocomplete-list hidden"></div>
+                </div>
+              </div>
+              <!-- 基本情報 -->
               <div class="form-group">
                 <label class="form-label" for="input-category">取引区分 <span style="color:#DC2626">*</span></label>
                 <select id="input-category" class="form-select" required>
@@ -122,25 +146,6 @@
               <div class="form-group full-width">
                 <label class="form-label" for="input-notes">備考</label>
                 <input type="text" id="input-notes" class="form-input" placeholder="特記事項やメモなどがあれば入力">
-              </div>
-              <!-- 注文書連携 -->
-              <div class="form-group full-width" style="margin-top: 4px; margin-bottom: -4px; padding-top: 12px; border-top: 1px dashed var(--border-color);">
-                <label class="form-label" style="display: flex; align-items: center; gap: 6px; color: var(--google-primary); font-weight: 600; font-size: 13px; letter-spacing: 0.5px; margin-bottom: 0;">
-                  <span class="material-symbols-outlined" style="font-size: 18px;">link</span>注文書連携
-                </label>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="input-linked-project">対象工事</label>
-                <select id="input-linked-project" class="form-select">
-                  <option value="">-- 選択してください --</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="input-order-number">注文書番号</label>
-                <div class="autocomplete-wrapper">
-                  <input type="text" id="input-order-number" class="form-input" placeholder="対象工事を選択すると候補が表示されます" autocomplete="off">
-                  <div id="order-suggestions" class="autocomplete-list hidden"></div>
-                </div>
               </div>
             </div>
             <div id="invoice-duplicate-alert" class="alert alert-warning hidden mt-4" style="margin-bottom: 0; width: 100%;"></div>

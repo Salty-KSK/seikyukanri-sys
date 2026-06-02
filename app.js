@@ -632,8 +632,28 @@
     // === 注文書連携: 対象工事 ⇔ 注文書番号の双方向連動 ===
     const orderNumInput = document.getElementById('input-order-number');
     const linkedProjectSelect = document.getElementById('input-linked-project');
+    const noOrderCheckbox = document.getElementById('input-no-order');
     let cachedOrders = []; // 選択中の工事の注文書一覧キャッシュ
     let isApplyingOrder = false; // 自動入力中フラグ（イベント循環防止）
+
+    // 「注文書なし」チェックボックスの制御
+    noOrderCheckbox.addEventListener('change', () => {
+      const disabled = noOrderCheckbox.checked;
+      const projectGroup = document.getElementById('group-linked-project');
+      const orderGroup = document.getElementById('group-order-number');
+
+      linkedProjectSelect.disabled = disabled;
+      orderNumInput.disabled = disabled;
+      projectGroup.style.opacity = disabled ? '0.4' : '1';
+      orderGroup.style.opacity = disabled ? '0.4' : '1';
+
+      if (disabled) {
+        linkedProjectSelect.value = '';
+        orderNumInput.value = '';
+        cachedOrders = [];
+        hideOrderRefInfo();
+      }
+    });
 
     // 発注金額・支払実績の参照情報を表示する関数
     function showOrderRefInfo(order) {
@@ -1104,6 +1124,13 @@
     // 発注金額・支払実績の非表示化
     const refEl = document.getElementById('order-ref-info');
     if (refEl) { refEl.classList.add('hidden'); refEl.style.display = 'none'; }
+
+    // 「注文書なし」チェックボックスのリセット
+    const noOrderCb = document.getElementById('input-no-order');
+    if (noOrderCb) {
+      noOrderCb.checked = false;
+      noOrderCb.dispatchEvent(new Event('change'));
+    }
   }
 
   function refreshRecentInvoices() {
