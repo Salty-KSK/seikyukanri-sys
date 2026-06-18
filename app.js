@@ -41,7 +41,15 @@
   // ユーティリティ
   // ----------------------------------------------------------
   function generateId() {
-    return Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
+    // 会社IDの連番生成（c001, c002, ...形式）
+    if (appData.companies && appData.companies.length > 0) {
+      const existingNums = appData.companies
+        .map(c => c.id && c.id.match(/^c(\d+)$/) ? parseInt(c.id.match(/^c(\d+)$/)[1], 10) : 0)
+        .filter(n => n > 0);
+      const maxNum = existingNums.length > 0 ? Math.max(...existingNums) : 0;
+      return 'c' + String(maxNum + 1).padStart(3, '0');
+    }
+    return 'c001';
   }
 
   function formatAmount(num) {
@@ -314,9 +322,11 @@
   // ----------------------------------------------------------
   // データ管理 (Google Apps Script + localStorage キャッシュ)
   // ----------------------------------------------------------
-  const GAS_URL = 'https://script.google.com/macros/s/AKfycbw6G6lXEqemHGSR6J5KrOS6zPX3SSKoo3__ZoxUQN32nquh_RWCEvOGZSa1I7RiBz0j2w/exec';
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbx3A7mwQDJYPKTZBKR0o-UxwLUK_NLW41KnfXnW2FLUoAIOjCLrsN_juKRpCqj18MeILg/exec';
   const LS_KEY = 'invoiceTool_data';
   let syncTimeout = null;
+  let pendingSave = false;   // クラウド未送信の変更があるかどうか
+  let lastSavedData = null;  // 最後に保存したデータのJSON文字列
 
   function updateConnectionStatus(status, message) {
     const statusEl = document.getElementById('data-status');
@@ -344,14 +354,98 @@
         updateConnectionStatus('disconnected', 'GASエラー');
         return false;
       }
-      if (data && data.invoices && Array.isArray(data.invoices) && data.invoices.length > 0) {
-        appData = data;
-        if (!appData.companies) appData.companies = [];
-        if (!appData.sites) appData.sites = [];
-        if (!appData.workTypes) appData.workTypes = [];
-        if (!appData.settings) appData.settings = { ...DEFAULT_DATA.settings };
+      if (data && (data.companies || (data.invoices && Array.isArray(data.invoices)))) {
+        // ローカルに保存されているデータを取得
+        let localData = null;
+        try {
+          const localRaw = localStorage.getItem(LS_KEY);
+          if (localRaw) {
+            localData = JSON.parse(localRaw);
+          }
+        } catch (e) { /* ignore */ }
+
+        let needsResync = false;
+
+        // === クラウドとローカルのデータを安全にマージ ===
+        // 方針: クラウドの会社データ（業者マスタ）を正とし、
+        //        invoices/sites/workTypes/settingsはクラウドにあればクラウド、なければローカルを使う
+
+        // 1. 会社データ: クラウド（業者マスタ）を正とする
+        //    ヘッダー行がデータに混入している場合はフィルタリングで除外
+        const cloudCompanies = (data.companies || []).filter(c => 
+          c.id !== 'ID' && c.name !== '会社名'
+        );
+        console.log('[loadFromCloud] 会社数(フィルタ後):', cloudCompanies.length);
+
+        // 2. ローカルにあるcontactPerson/emailをクラウドにマージ
+        //    ローカル側にデータがあれば常にローカルを優先（ユーザーの直近の入力を保護）
+        const localCompanies = (localData && localData.companies) ? localData.companies : [];
+        const mergedCompanies = cloudCompanies.map(cloudCompany => {
+          const localMatch = localCompanies.find(lc => lc.id === cloudCompany.id || lc.name === cloudCompany.name);
+          if (localMatch) {
+            // ローカルにcontactPersonがあれば常にローカルを優先
+            if (localMatch.contactPerson) {
+              if (cloudCompany.contactPerson !== localMatch.contactPerson) {
+                console.log('[マージ] ' + cloudCompany.name + ' contactPerson: [' + cloudCompany.contactPerson + '] → [' + localMatch.contactPerson + ']');
+                needsResync = true;
+              }
+              cloudCompany.contactPerson = localMatch.contactPerson;
+            }
+            if (localMatch.email) {
+              if (cloudCompany.email !== localMatch.email) {
+                console.log('[マージ] ' + cloudCompany.name + ' email: [' + cloudCompany.email + '] → [' + localMatch.email + ']');
+                needsResync = true;
+              }
+              cloudCompany.email = localMatch.email;
+            }
+          }
+          return cloudCompany;
+        });
+
+        // 3. invoices: クラウドにあればクラウド優先、なければローカルをそのまま使う
+        let mergedInvoices;
+        if (data.invoices && Array.isArray(data.invoices) && data.invoices.length > 0) {
+          // クラウドにinvoicesがある → ローカル限定のものをマージ
+          const cloudInvoiceIds = new Set(data.invoices.map(inv => inv.id));
+          const localOnlyInvoices = (localData && localData.invoices)
+            ? localData.invoices.filter(inv => !cloudInvoiceIds.has(inv.id))
+            : [];
+          if (localOnlyInvoices.length > 0) {
+            console.log(`[マージ] ローカル限定の請求データ ${localOnlyInvoices.length} 件をマージ`);
+            needsResync = true;
+          }
+          mergedInvoices = [...data.invoices, ...localOnlyInvoices];
+        } else {
+          // クラウドにinvoicesがない → ローカルのinvoicesをそのまま保持
+          mergedInvoices = (localData && localData.invoices) ? localData.invoices : (appData.invoices || []);
+        }
+
+        // 4. その他のデータ: クラウドにあればクラウド、なければローカル
+        const mergedSites = (data.sites && data.sites.length > 0) ? data.sites
+          : (localData && localData.sites) ? localData.sites : (appData.sites || []);
+        const mergedWorkTypes = (data.workTypes && data.workTypes.length > 0) ? data.workTypes
+          : (localData && localData.workTypes) ? localData.workTypes : (appData.workTypes || []);
+        const mergedSettings = (data.settings && Object.keys(data.settings).length > 0) ? data.settings
+          : (localData && localData.settings) ? localData.settings : (appData.settings || { ...DEFAULT_DATA.settings });
+
+        // 5. appDataを組み立て
+        appData = {
+          companies: mergedCompanies,
+          invoices: mergedInvoices,
+          sites: mergedSites,
+          workTypes: mergedWorkTypes,
+          settings: mergedSettings,
+        };
+
         localStorage.setItem(LS_KEY, JSON.stringify(appData));
         updateConnectionStatus('connected', 'クラウド同期済');
+
+        // マージが発生した場合はクラウドにも書き戻して同期
+        if (needsResync) {
+          console.log('[マージ] ローカルデータをクラウドに書き戻します');
+          saveToFile(true);
+        }
+
         return true;
       }
       console.log('Cloud data empty or no invoices');
@@ -382,28 +476,72 @@
     return false;
   }
 
-  function saveToFile() {
+  // flush=true の場合はデバウンスせず即座にクラウドに送信
+  function saveToFile(flush = false) {
     // 1. localStorage に即時保存（高速レスポンス用）
     try {
       localStorage.setItem(LS_KEY, JSON.stringify(appData));
+      lastSavedData = JSON.stringify(appData); // 最終保存データを記録
     } catch (e) {
       console.warn('localStorage save failed:', e);
     }
-    // 2. クラウドへのデバウンス同期（最後の変更から1.5秒後に送信）
-    if (syncTimeout) clearTimeout(syncTimeout);
-    updateConnectionStatus('syncing', '保存中...');
-    syncTimeout = setTimeout(async () => {
+
+    // 2. クラウドへの同期
+    async function doCloudSync() {
       try {
-        await fetch(GAS_URL, {
+        const postBody = JSON.stringify(appData);
+        const companiesCount = appData.companies ? appData.companies.length : 0;
+        // 白浜空設の担当者を確認
+        const shirahama = appData.companies ? appData.companies.find(c => c.name && c.name.includes('白浜')) : null;
+        console.log('[doCloudSync] POST送信開始 - 会社数:', companiesCount, 
+          '白浜contactPerson:', shirahama ? shirahama.contactPerson : '会社なし',
+          'データサイズ:', postBody.length, 'bytes');
+        
+        const res = await fetch(GAS_URL, {
           method: 'POST',
-          body: JSON.stringify(appData)
+          redirect: 'follow',
+          body: postBody
         });
-        updateConnectionStatus('connected', 'クラウド同期済');
+        console.log('[doCloudSync] POST応答 - status:', res.status, 'ok:', res.ok);
+        if (res.ok) {
+          try {
+            const result = await res.json();
+            console.log('[doCloudSync] 結果:', JSON.stringify(result));
+            if (result && result.success === false) {
+              console.error('Cloud save rejected:', result.error);
+              showToast('保存エラー: ' + (result.error || '不明'), 'error');
+              updateConnectionStatus('disconnected', '保存エラー');
+              return;
+            }
+          } catch (e) { 
+            console.log('[doCloudSync] JSONパース失敗(OK):', e.message);
+          }
+          updateConnectionStatus('connected', 'クラウド同期済');
+          pendingSave = false;
+        } else {
+          console.error('Cloud save HTTP error:', res.status);
+          showToast('クラウド保存に失敗しました (HTTP ' + res.status + ')', 'error');
+          updateConnectionStatus('disconnected', 'HTTP ' + res.status);
+        }
       } catch (e) {
-        console.warn('Cloud save failed:', e);
+        console.error('[doCloudSync] 通信エラー:', e.name, e.message, e.stack);
+        showToast('通信エラー: クラウドに保存できませんでした', 'error');
         updateConnectionStatus('disconnected', '同期エラー');
       }
-    }, 1500);
+    }
+
+    pendingSave = true;
+    if (flush) {
+      // 即時送信（マージ後の書き戻しなど）
+      if (syncTimeout) clearTimeout(syncTimeout);
+      updateConnectionStatus('syncing', '同期中...');
+      doCloudSync();
+    } else {
+      // デバウンス同期（最後の変更から2秒後に送信）
+      if (syncTimeout) clearTimeout(syncTimeout);
+      updateConnectionStatus('syncing', '保存中...');
+      syncTimeout = setTimeout(doCloudSync, 2000);
+    }
   }
 
   // ----------------------------------------------------------
@@ -413,6 +551,22 @@
     const buttons = document.querySelectorAll('.nav-item');
     const contents = document.querySelectorAll('.tab-content');
 
+    // リロード時に前回のタブを復元
+    const savedTab = localStorage.getItem('activeTab');
+    if (savedTab) {
+      buttons.forEach((b) => b.classList.remove('active'));
+      contents.forEach((c) => c.classList.remove('active'));
+      const savedBtn = document.querySelector(`.nav-item[data-tab="${savedTab}"]`);
+      const savedContent = document.getElementById('tab-' + savedTab);
+      if (savedBtn && savedContent) {
+        savedBtn.classList.add('active');
+        savedContent.classList.add('active');
+        if (savedTab === 'list') refreshInvoiceList();
+        if (savedTab === 'notice') refreshNoticeSection();
+        if (savedTab === 'settings') refreshSettings();
+      }
+    }
+
     buttons.forEach((btn) => {
       btn.addEventListener('click', () => {
         const tab = btn.dataset.tab;
@@ -420,6 +574,9 @@
         contents.forEach((c) => c.classList.remove('active'));
         btn.classList.add('active');
         document.getElementById('tab-' + tab).classList.add('active');
+
+        // タブ状態を保存
+        localStorage.setItem('activeTab', tab);
 
         // タブ切替時にデータリフレッシュ
         if (tab === 'list') refreshInvoiceList();
@@ -1360,7 +1517,7 @@
       }
     }
 
-    saveToFile();
+    saveToFile(true); // 即時同期（リロード時のデータ消失防止）
     closeCompanyModal();
     refreshSettings();
   }
@@ -2388,27 +2545,41 @@
     const cloudLoaded = await loadFromCloud();
 
     if (!cloudLoaded) {
-      // クラウドが空 or 通信エラーの場合
+      // クラウド通信エラーの場合 → ローカルデータをそのまま使用
+      // ※ ローカルデータでクラウドを上書きしない（会社データ消失防止）
+      console.log('[init] クラウド読み込み失敗。ローカルデータを使用します。');
       if (!appData.invoices || appData.invoices.length === 0) {
-        // ローカルにもデータがない → 初期データをdata.jsonから読み込み
+        // ローカルにもデータがない → 初期データをdata.jsonから読み込み（初回起動時のみ）
         try {
           const res = await fetch('data.json');
           const initialData = await res.json();
           if (initialData && initialData.invoices) {
             appData = initialData;
-            saveToFile(); // クラウドにもアップロード
+            saveToFile();
           }
         } catch (e) {
           console.warn('Initial data load failed:', e);
         }
-      } else {
-        // ローカルにデータがあるがクラウドが空 → クラウドにアップロード
-        saveToFile();
       }
+      // ローカルにデータがある場合はそのまま使用（クラウドへの上書きはしない）
     }
 
     refreshAll();
   }
+
+  // ページ離脱時に未保存データを即座に送信（デバウンス中のデータロスト防止）
+  window.addEventListener('beforeunload', () => {
+    if (pendingSave) {
+      // sendBeacon はページ離脱後もバックグラウンドでリクエストを完了させる
+      try {
+        const blob = new Blob([JSON.stringify(appData)], { type: 'application/json' });
+        navigator.sendBeacon(GAS_URL, blob);
+        console.log('[beforeunload] 未保存データをsendBeaconで送信しました');
+      } catch (e) {
+        console.warn('[beforeunload] sendBeacon failed:', e);
+      }
+    }
+  });
 
   // DOM Ready
   if (document.readyState === 'loading') {
