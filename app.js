@@ -1306,7 +1306,7 @@
       </tr></thead><tbody>`;
 
     recent.forEach((inv) => {
-      const company = appData.companies.find((c) => c.id === inv.companyId);
+      const company = appData.companies.find((c) => c.id === inv.companyId) || appData.companies.find((c) => c.name === inv.companyName);
       const categoryLabel = { outsource: '外注', material: '資機材', expense: '経費' }[inv.category || 'outsource'];
       html += `<tr>
         <td>${escapeHtml(company ? company.name : '不明')}</td>
@@ -1360,7 +1360,7 @@
     editingInvoiceId = id;
 
     // 会社名取得
-    const company = appData.companies.find((c) => c.id === inv.companyId);
+    const company = appData.companies.find((c) => c.id === inv.companyId) || appData.companies.find((c) => c.name === inv.companyName);
 
     // フォームに値を復元
     document.getElementById('input-company').value = company ? company.name : '';
