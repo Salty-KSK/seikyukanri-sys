@@ -1520,6 +1520,50 @@
     saveToFile(true); // 即時同期（リロード時のデータ消失防止）
     closeCompanyModal();
     refreshSettings();
+
+    // === Supabase vendors テーブルへ同期 ===
+    syncVendorToSupabase(companyData).catch(e => console.warn('Supabase業者同期エラー:', e));
+  }
+
+  // Supabase vendors テーブルに業者を同期（upsert相当）
+  async function syncVendorToSupabase(companyData) {
+    try {
+      // 既存チェック（名前で検索）
+      const { data: existing } = await supabaseClient
+        .from('vendors')
+        .select('id')
+        .eq('name', companyData.name)
+        .maybeSingle();
+
+      const vendorRow = {
+        name: companyData.name,
+        kana: companyData.kana || '',
+        industry: companyData.industry || '外注',
+        postal_code: companyData.postalCode || '',
+        address: companyData.address || '',
+        tel: companyData.tel || '',
+        fax: companyData.fax || '',
+        invoice_number: companyData.invoiceNumber || '',
+        bank_name: companyData.bankName || '',
+        branch_name: companyData.branchName || '',
+        account_type: companyData.accountType || '普通',
+        account_number: companyData.accountNumber || '',
+        contact_person: companyData.contactPerson || '',
+        email: companyData.email || '',
+      };
+
+      if (existing && existing.id) {
+        // 既存 → 更新
+        await supabaseClient.from('vendors').update(vendorRow).eq('id', existing.id);
+        console.log('[Supabase] 業者更新:', companyData.name);
+      } else {
+        // 新規 → 追加
+        await supabaseClient.from('vendors').insert(vendorRow);
+        console.log('[Supabase] 業者追加:', companyData.name);
+      }
+    } catch (e) {
+      console.error('[Supabase] 業者同期エラー:', e);
+    }
   }
 
   // ----------------------------------------------------------
@@ -2562,6 +2606,47 @@
         }
       }
       // ローカルにデータがある場合はそのまま使用（クラウドへの上書きはしない）
+    }
+
+    // === Supabase vendors テーブルから業者データを補完 ===
+    try {
+      const { data: supaVendors } = await supabaseClient
+        .from('vendors')
+        .select('name, kana, industry, postal_code, address, tel, fax, invoice_number, bank_name, branch_name, account_type, account_number, contact_person, email')
+        .order('kana', { ascending: true });
+
+      if (supaVendors && supaVendors.length > 0) {
+        const existingNames = new Set(appData.companies.map(c => c.name));
+        let addedCount = 0;
+        supaVendors.forEach(sv => {
+          if (!existingNames.has(sv.name)) {
+            appData.companies.push({
+              id: generateId(),
+              name: sv.name,
+              kana: sv.kana || '',
+              industry: sv.industry || '外注',
+              postalCode: sv.postal_code || '',
+              address: sv.address || '',
+              tel: sv.tel || '',
+              fax: sv.fax || '',
+              invoiceNumber: sv.invoice_number || '',
+              bankName: sv.bank_name || '',
+              branchName: sv.branch_name || '',
+              accountType: sv.account_type || '普通',
+              accountNumber: sv.account_number || '',
+              contactPerson: sv.contact_person || '',
+              email: sv.email || '',
+            });
+            addedCount++;
+          }
+        });
+        if (addedCount > 0) {
+          console.log(`[Supabase] ${addedCount} 社の業者をSupabaseから補完しました`);
+          localStorage.setItem(LS_KEY, JSON.stringify(appData));
+        }
+      }
+    } catch (e) {
+      console.warn('Supabase業者データの取得に失敗:', e);
     }
 
     refreshAll();
