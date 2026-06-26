@@ -1162,6 +1162,8 @@
         email: '',
       };
       appData.companies.push(company);
+      // Supabaseにも同期
+      syncVendorToSupabase(company).catch(e => console.warn('Supabase業者同期エラー:', e));
     }
 
     // 現場名・工事内容の記録 (経費でなければ工事内容もマスターに記録)
@@ -2503,6 +2505,10 @@
           saveToFile();
           refreshCompanyMasterList();
           showToast(`${c.name} を削除しました`);
+          // Supabaseからも削除
+          supabaseClient.from('vendors').delete().eq('name', c.name)
+            .then(() => console.log('[Supabase] 業者削除:', c.name))
+            .catch(e => console.warn('Supabase業者削除エラー:', e));
         }
       });
     });
